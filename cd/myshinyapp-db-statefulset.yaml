@@ -131,7 +131,7 @@ spec:
               name: myshiny-app-fe
           volumeMounts:
             - name: myshiny-app-fe-pv
-              mountPath: /opt/drupal
+              mountPath: /var/www/html
               # mountPath: /var/www/html/modules
             #   subPath: modules
             # - name: myshiny-app-fe-pv
