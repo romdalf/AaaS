@@ -92,7 +92,7 @@ spec:
     requests:
       storage: 10Gi
 ---
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: myshiny-app-fe
