@@ -89,7 +89,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: myshiny-app-fe-pvc
-  namespace: myshiny-app
+  # namespace: myshiny-app
   labels:
     app: myshiny-app-fe
     env: prod
