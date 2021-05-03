@@ -19,6 +19,6 @@ spec:
         path: "/"
         backend:
           service:
-            name: myshiny-app-fe
+            name: myshiny-app-fe-service
             port:
               number: 80
