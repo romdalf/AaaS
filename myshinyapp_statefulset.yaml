@@ -31,6 +31,7 @@ spec:
     - metadata:
         name: myshiny-app-db-pvc
         labels:
+          app: myshiny-app-db
           env: prod
       spec:
         accessModes: ["ReadWriteOnce"]
