@@ -101,6 +101,11 @@ metadata:
     app: myshiny-app-fe
     env: prod
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myshiny-app-fe
+      env: prod
   strategy:
     type: Recreate
   template:
