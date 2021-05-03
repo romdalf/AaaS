@@ -119,7 +119,7 @@ spec:
         - image: drupal:latest
           name: drupal
           ports:
-            - containerPort: 30080
+            - containerPort: 8080
           volumeMounts:
             - name: myshiny-app-fe-pv
               mountPath: /var/www/html/modules
