@@ -44,3 +44,19 @@ spec:
         resources:
           requests:
             storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myshiny-app-db-service
+  namespace: myshiny-app
+  labels:
+    app: myshiny-app-db
+    env: prod
+spec:
+  type: NodePort
+  ports:
+   - port: 5432
+  selector:
+    app: myshiny-app-db
+    env: prod
