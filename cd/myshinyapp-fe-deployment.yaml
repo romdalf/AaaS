@@ -65,8 +65,8 @@ spec:
             - name: myshiny-app-fe-pv
               mountPath: /data
       containers:
-        - image: drupal:latest
-          name: myshiny-app-fe
+        - name: myshiny-app-fe
+          image: drupal:latest
           ports:
           - containerPort: 30080
           volumeMounts:
