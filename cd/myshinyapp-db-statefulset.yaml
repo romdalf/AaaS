@@ -12,6 +12,7 @@ metadata:
     app: myshiny-app-db
     env: prod
 spec:
+  type: NodePort
   ports:
    - port: 5432
   selector:
@@ -37,7 +38,7 @@ spec:
         env: prod
     spec:
       containers:
-        - name: myshiny-app-db
+        - name: myshinyappdb
           image: postgres
           volumeMounts:
             - name: myshiny-app-db-pvc
