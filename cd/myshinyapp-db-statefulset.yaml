@@ -131,14 +131,15 @@ spec:
               name: myshiny-app-fe
           volumeMounts:
             - name: myshiny-app-fe-pv
-              mountPath: /var/www/html/modules
-              subPath: modules
-            - name: myshiny-app-fe-pv
-              mountPath: /var/www/html/profiles
-              subPath: profiles
-            - name: myshiny-app-fe-pv
-              mountPath: /var/www/html/themes
-              subPath: themes
+              mountPath: /opt/drupal
+              # mountPath: /var/www/html/modules
+            #   subPath: modules
+            # - name: myshiny-app-fe-pv
+            #   mountPath: /var/www/html/profiles
+            #   subPath: profiles
+            # - name: myshiny-app-fe-pv
+            #   mountPath: /var/www/html/themes
+            #   subPath: themes
       volumes:
         - name: myshiny-app-fe-pv
           persistentVolumeClaim:
