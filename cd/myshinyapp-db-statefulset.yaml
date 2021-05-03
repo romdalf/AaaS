@@ -146,9 +146,10 @@ spec:
         - name: fix-perms
           image: busybox
           command: ["/bin/chown","-R", "www-data:www-data","/var/www/html/sites"]
-          # volumeMounts:
-          #   - name: myshiny-app-fe-pv
-          #     mountPath: /var/www/html/sites
+          volumeMounts:
+            - name: myshiny-app-fe-pv
+              mountPath: /var/www/html/sites
+              subPath: sites
       volumes:
         - name: myshiny-app-fe-pv
           persistentVolumeClaim:
