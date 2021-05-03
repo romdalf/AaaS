@@ -70,9 +70,10 @@ metadata:
     app: myshiny-app-fe
     env: prod
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
-   - port: 5432
+   - port: 8081
+     target: 8080
   selector:
     app: myshiny-app-fe
     env: prod
