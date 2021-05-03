@@ -73,7 +73,7 @@ spec:
   type: NodePort
   ports:
    - port: 80
-     nodePort: 8080
+     nodePort: 30080
   selector:
     app: myshiny-app-fe
     env: prod
@@ -120,7 +120,7 @@ spec:
         - image: drupal:latest
           name: drupal
           ports:
-            - containerPort: 8080
+            - containerPort: 30080
           volumeMounts:
             - name: myshiny-app-fe-pv
               mountPath: /var/www/html/modules
