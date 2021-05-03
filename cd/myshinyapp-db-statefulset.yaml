@@ -25,6 +25,12 @@ kind: StatefulSet
 metadata:
   name: myshiny-app-db
   namespace: myshiny-app
+  annotations:
+    backup.velero.io/backup-volumes: myshiny-app-db-pvc
+    pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/var/lib/postgresql"]'
+    pre.hook.backup.velero.io/container: fsfreeze
+    post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/var/lib/postgresql"]'
+    post.hook.backup.velero.io/container: fsfreeze    
 spec:
   selector:
     matchLabels:
@@ -110,6 +116,8 @@ metadata:
   labels:
     app: myshiny-app-fe
     env: prod
+  annotations:
+    backup.velero.io/backup-volumes: myshiny-app-fe-pv
 spec:
   replicas: 1
   selector:
