@@ -6,13 +6,13 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: myshiny-app-db-service
+  name: myshiny-app-db
   namespace: myshiny-app
   labels:
     app: myshiny-app-db
     env: prod
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
    - port: 5432
   selector:
@@ -38,11 +38,8 @@ spec:
         env: prod
     spec:
       containers:
-        - name: myshinyappdb
+        - name: myshiny-app-db
           image: postgres
-          volumeMounts:
-            - name: myshiny-app-db-pvc
-              mountPath: /var/lib/postgresql/data
           ports:
             - containerPort: 5432
               name: myshiny-app-db
@@ -55,6 +52,9 @@ spec:
               value: myshinyapppassword
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: myshiny-app-db-pvc
+              mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
     - metadata:
         name: myshiny-app-db-pvc
@@ -125,9 +125,10 @@ spec:
     spec:
       containers:
         - image: drupal:latest
-          name: drupal
+          name: myshiny-app-fe
           ports:
             - containerPort: 30080
+              name: myshiny-app-fe
           volumeMounts:
             - name: myshiny-app-fe-pv
               mountPath: /var/www/html/modules
