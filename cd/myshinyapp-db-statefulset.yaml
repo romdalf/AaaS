@@ -149,7 +149,6 @@ spec:
           volumeMounts:
             - name: myshiny-app-fe-pv
               mountPath: /var/www/html/sites
-              subPath: sites
       volumes:
         - name: myshiny-app-fe-pv
           persistentVolumeClaim:
