@@ -78,7 +78,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: myshiny-app-fe-service
+  name: myshiny-app-fe
   namespace: myshiny-app
   labels:
     app: myshiny-app-fe
@@ -144,7 +144,8 @@ spec:
         - image: drupal:latest
           name: myshiny-app-fe
           ports:
-            - containerPort: 30080
+            - ports
+              - containerPort: 30080
               name: myshiny-app-fe
           volumeMounts:
             - name: myshiny-app-fe-pv

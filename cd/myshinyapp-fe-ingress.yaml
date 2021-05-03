@@ -9,16 +9,16 @@ metadata:
 spec:
   tls:
   - hosts:
-    - myshiny-app.doks.myshiny.space
+    - myshinyapp.doks.myshiny.space
     secretName: myshiny-app-tls
   rules:
-  - host: "myshiny-app.doks.myshiny.space"
+  - host: "myshinyapp.doks.myshiny.space"
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: myshiny-app-fe-service
+            name: myshiny-app-fe
             port:
               number: 80
