@@ -33,23 +33,19 @@ spec:
       storage: 10Gi
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: myshiny-app-fe
   namespace: myshiny-app
-  labels:
-    app: myshiny-app-fe
-    env: prod
   annotations:
     backup.velero.io/backup-volumes: myshiny-app-fe-pv
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: myshiny-app-fe
       env: prod
-  strategy:
-    type: Recreate
+  serviceName: myshiny-app-fe-service
+  replicas: 1
   template:
     metadata:
       labels:
@@ -68,7 +64,8 @@ spec:
         - name: myshiny-app-fe
           image: drupal:latest
           ports:
-          - containerPort: 30080
+            - containerPort: 30080
+              name: myshiny-app-fe
           volumeMounts:
             - name: myshiny-app-fe-pv
               mountPath: /var/www/html/modules
@@ -82,7 +79,15 @@ spec:
             - name: myshiny-app-fe-pv
               mountPath: /var/www/html/sites
               subPath: sites
-      volumes:
-        - name: myshiny-app-fe-pv
-          persistentVolumeClaim:
-            claimName: myshiny-app-fe-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: myshiny-app-fe-pv
+        labels:
+          app: myshiny-app-fe
+          env: prod
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "fast"
+        resources:
+          requests:
+            storage: 1Gi
