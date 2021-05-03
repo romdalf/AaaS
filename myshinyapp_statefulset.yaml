@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myshiny-app
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: myshiny-app
+spec:
+  selector:
+    matchLabels:
+      app: myshiny-app-db
+      env: prod
+  serviceName: myshiny-app-db-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: myshiny-app
+        env: prod
+    spec:
+      containers:
+        - name: myshiny-app-db
+          image: postgres
+          volumeMounts:
+            - name: myshiny-app-db-pvc
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_PASSWORD
+              value: mysecretpassword
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+  volumeClaimTemplates:
+    - metadata:
+        name: myshiny-app-db-pvc
+        labels:
+          env: prod
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "fast"
+        resources:
+          requests:
+            storage: 1Gi
