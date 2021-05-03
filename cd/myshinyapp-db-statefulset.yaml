@@ -126,7 +126,7 @@ spec:
       initContainers:
         - name: fix-perms
           image: drupal:latest
-          command: ['bin/bash','-c']
+          command: ['/bin/bash','-c']
           args: ['/bin/cp -R /var/www/html/sites/ /data/; chown -R www-data:www-data /data/']
           volumeMounts:
             - name: myshiny-app-fe-pv
