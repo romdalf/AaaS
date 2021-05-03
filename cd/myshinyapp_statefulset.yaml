@@ -1,12 +1,7 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: myshiny-app
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: db
+  name: myshiny-app-db
   namespace: myshiny-app
 spec:
   selector:
@@ -18,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        app: myshiny-app
+        app: myshiny-app-db
         env: prod
     spec:
       containers:
@@ -36,6 +31,7 @@ spec:
     - metadata:
         name: myshiny-app-db-pvc
         labels:
+          app: myshiny-app-db
           env: prod
       spec:
         accessModes: ["ReadWriteOnce"]
