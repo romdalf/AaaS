@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myshiny-app-ingress
+  namespace: myshiny-app
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: doks-cert
+spec:
+  tls:
+  - hosts:
+    - myshiny-app.doks.myshiny.space
+    secretName: myshiny-app-tls
+  rules:
+  - host: "myshiny-app.doks.myshiny.space"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: myshiny-app-fe
+            port:
+              number: 80
