@@ -8,29 +8,13 @@ metadata:
     app: myshiny-app-fe
     env: prod
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
    - port: 80
      targetPort: 30080
   selector:
     app: myshiny-app-fe
     env: prod
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: myshiny-app-fe-pvc
-  namespace: myshiny-app
-  labels:
-    app: myshiny-app-fe
-    env: prod
-spec:
-  storageClassName: fast
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
