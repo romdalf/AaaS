@@ -108,3 +108,14 @@ As an example, a typical scenario would be the deletion of the containers runnin
 ### cms drupal with postgresql
 The CMS Drupal is well know solution used by enterprise companies. The CMS is written in PHP, requires multiple libraries, an Apache server with PHP module, and a database service like PostgreSQL. The actual [installation guide](https://www.drupal.org/docs/installing-drupal) is quite long and extensive.
 
+From a container perspective, the following entries will show how to perform a Kubernetes deployment in an incremental way; from a testing approach to a production grade release management one.
+
+#### namespace
+Also known as project, a namespace is a logical separation providing the necessary abstract for multi-tenancy. To create a namespace for DBaaS, the following manifest can be applied:
+```yaml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: food-app
+```
