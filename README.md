@@ -59,18 +59,3 @@ k port-forward svc/myshiny-app-fe-service -n myshiny-app 8081:80 --address
 k delete namespace myshiny-app 
 
 
-bkps	
-OKWQ6SNKQ3URNC2VER6G  
-Secret	
-ygD0kKCSNT1S5n31CkW+VvzHhJf9p9xn5l5hMtpHQ14
-
-
-
-velero install                                                                                   \
---provider aws                                                                                   \
---plugins velero/velero-plugin-for-aws:v1.2.0                                                    \
---bucket storageos-s3-backup                                                                                  \
---secret-file ./credentials-Velero                                                               \
---use-volume-snapshots=false                                                                     \
---backup-location-config region=do,s3ForcePathStyle="true",s3Url=https://bkps.myshiny.space \
---use-restic
