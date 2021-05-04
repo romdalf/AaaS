@@ -61,7 +61,7 @@ spec:
           env: prod
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "fast"
+        storageClassName: "storageos-rep-1"
         resources:
           requests:
             storage: 1Gi
