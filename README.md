@@ -117,5 +117,77 @@ Also known as project, a namespace is a logical separation providing the necessa
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: food-app
+  name: foodmag-app
+```
+
+#### postgresql 
+Postgresql is the chosen one here. This workload represents perfectly the concept of stateful application as we wish to keep the data in through any failure or life-cycle events. To create such specific workload, a statefulset configuration will be used:
+```yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foodmag-app-db
+  namespace: foodmag-app
+  labels:
+    app: foodmag-app-db
+    env: prod
+spec:
+  type: ClusterIP
+  ports:
+   - port: 5432
+  selector:
+    app: foodmag-app-db
+    env: prod
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: foodmag-app-db
+  namespace: foodmag-app
+  annotations:
+    backup.velero.io/backup-volumes: foodmag-app-db-pvc
+spec:
+  selector:
+    matchLabels:
+      app: foodmag-app-db
+      env: prod
+  serviceName: foodmag-app-db-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: foodmag-app-db
+        env: prod
+    spec:
+      containers:
+        - name: foodmag-app-db
+          image: postgres
+          ports:
+            - containerPort: 5432
+              name: foodmag-app-db
+          env:
+            - name: POSTGRES_DB
+              value: foodmagappdb
+            - name: POSTGRES_USER
+              value: foodmagapp
+            - name: POSTGRES_PASSWORD
+              value: foodmagpassword
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: foodmag-app-db-pvc
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: foodmag-app-db-pvc
+        labels:
+          app: foodmag-app-db
+          env: prod
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "storageos-rep-1"
+        resources:
+          requests:
+            storage: 1Gi
 ```
