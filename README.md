@@ -91,3 +91,16 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-namespace: kube-system
 ```
 
+## from legacy deployment to kubenetes stateful workload
+### deployment overview
+While a legacy workload has to be deployed, the activity will require the full understanding of the infrastructure at all layers including, and not limited to, compute, operating system flavor, storage (both local or remote), networking (DNS, IP, load balancer, firewall, ...), package management, sources, along side potential release management and automation software.  
+Considering the above, it is almost impossible to provide a single and unique deployment methodology allowing to deploy in a fully agnostic approach or if only one of the infrastructure component state would change.
+
+Using containers provide from an application standpoint the necessary abstraction layers with a portable image to be deployed on any platform provider running a container runtime like Kubernetes with containerd or cri-o.  
+Using Kubernetes provide from an infrastructure standpoint the necessary abstraction layers with the removal of all infrastructure component considerations rendering agnostic any container deployment.
+
+### stateful workload
+When deploying a legacy workload or a stateful workload, it requires capability to record data in a persistent way. However, by design and out-of-the-box, Kubernetes doesn't provide any scalable and high available persistent storage option.  
+As such, a solution like [StorageOS](https://storageos.com) is required to provide Kubernetes with a cloud native storage solution capable of interacting natively, high available, scalable vertically and horizontally, and secure persistent storage. 
+
+As an example, a typical scenario would be the deletion of the containers running a front-end and/or a database. When recreating the corresponding containers, it will restart with the relevant persistent storage at the last known state at the deletion time. 
