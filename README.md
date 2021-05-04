@@ -1,7 +1,7 @@
 ![argrocd-sync](https://argocd.doks.myshiny.space/api/badge?name=myshiny-app&revision=true)
 
-## database-as-a-Service (DBaaS)
-This repository content is used to illustrate the usage of persistent storage within Kubernetes when migrating a stateful legacy application leveraging [StorageOS](https://storageos.com) as a cloud native storage backend.
+# database-as-a-Service (DBaaS)
+This repository content is used to illustrate the usage of persistent storage within Kubernetes when migrating a legacy application towards a containerized stateful worload leveraging [StorageOS](https://storageos.com) as a cloud native storage backend.
 
 
 ## prerequisites 
