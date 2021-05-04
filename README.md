@@ -8,6 +8,46 @@ This repository content is used to illustrate the usage of persistent storage wi
 The only one requirement is to have a running kubernetes cluster deployed either on-prem or in any cloud providers. 
 
 ## preparing the cluster
+### ingress and cert-manager
+Note: this part is depending of the type of Kubernetes cluster deployment. This repo example has been tested successfully with DigitalOcean Kubernetes Service. 
+Using helm, the following commands have to be perfomed:
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true
+```
+Verify the deployment of the load balancer for readiness:
+```
+kubectl --namespace default get services -o wide -w nginx-ingress-ingress-nginx-controller
+```
+Once the nginx ingress is deployed successfully, deploying cert-manager will allow to provide with TLS termination dynamically provisioned with Let's Encrypt:
+```
+kubectl create namespace cert-manager
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.2.0 --set installCRDs=true
+```
+Once cert-manager is deployed, a manifest has to be applied to configure the certificate issuer (see the file certmanager_issuer.yaml in the directory extra):
+```yaml 
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: doks-cert
+spec:
+  acme:
+    # Email address used for ACME registration
+    email: your@email
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      # Name of a secret used to store the ACME account private key
+      name: doks-cert-private-key
+    # Add a single challenge solver, HTTP01 using nginx
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+```
+
 ### argocd
 Deploying ArgoCD to illustrate the concept of Continuous Delivery using GitOps.
 ```
