@@ -119,11 +119,15 @@ kind: Namespace
 metadata:
   name: foodmag-app
 ```
+To apply this satefulset manifest, run the following:
+```
+kubectl apply -f cd/foodmag-namespace.yaml
+```
 
 #### postgresql 
 Postgresql is the chosen one here. This workload represents perfectly the concept of stateful application as we wish to keep the data in through any failure or life-cycle events. To create such specific workload, a statefulset configuration will be used:
 ```yaml
----
+--- # Service will allow to expose the postgresql server service to access internally
 apiVersion: v1
 kind: Service
 metadata:
@@ -139,7 +143,7 @@ spec:
   selector:
     app: foodmag-app-db
     env: prod
----
+--- # StatefullSet is a definition the application and volumes to be used
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -190,4 +194,94 @@ spec:
         resources:
           requests:
             storage: 1Gi
+```
+To apply this satefulset manifest, run the following:
+```
+kubectl apply -f cd/foodmag-db-statefulset.yaml
+```
+
+#### drupal 
+Similarly to PostgreSQL, Drupal has also to record states because of its deployment style and also its multi-site, document library, themes, and other potential features. To create such specific workload, a statefulset configuration will be used:
+```yaml
+--- # Service will allow to expose the cms externally to the load balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: foodmag-app-fe-service
+  namespace: foodmag-app
+  labels:
+    app: foodmag-app-fe
+    env: prod
+spec:
+  type: NodePort
+  ports:
+   - port: 80
+     nodePort: 30080
+  selector:
+    app: foodmag-app-fe
+    env: prod
+--- # StatefullSet is a definition the application and volumes to be used
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: foodmag-app-fe
+  namespace: foodmag-app
+  annotations:
+    backup.velero.io/backup-volumes: foodmag-app-fe-pv
+spec:
+  selector:
+    matchLabels:
+      app: foodmag-app-fe
+      env: prod
+  serviceName: foodmag-app-fe-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: foodmag-app-fe
+        env: prod
+    spec:
+      initContainers:
+        - name: fix-perms
+          image: drupal:latest
+          command: ['/bin/bash','-c']
+          args: ['/bin/cp -R /var/www/html/sites/ /data/; chown -R www-data:www-data /data/']
+          volumeMounts:
+            - name: foodmag-app-fe-pv
+              mountPath: /data
+      containers:
+        - name: foodmag-app-fe
+          image: drupal:latest
+          ports:
+            - containerPort: 30080
+              name: foodmag-app-fe
+          volumeMounts:
+            - name: foodmag-app-fe-pv
+              mountPath: /var/www/html/modules
+              subPath: modules
+            - name: foodmag-app-fe-pv
+              mountPath: /var/www/html/profiles
+              subPath: profiles
+            - name: foodmag-app-fe-pv
+              mountPath: /var/www/html/themes
+              subPath: themes
+            - name: foodmag-app-fe-pv
+              mountPath: /var/www/html/sites
+              subPath: sites
+  volumeClaimTemplates:
+    - metadata:
+        name: foodmag-app-fe-pv
+        labels:
+          app: foodmag-app-fe
+          env: prod
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "storageos-rep-1"
+        resources:
+          requests:
+            storage: 1Gi
+```
+To apply this satefulset manifest, run the following:
+```
+kubectl apply -f cd/foodmag-fe-statefulset.yaml
 ```
