@@ -8,8 +8,8 @@ This repository content is used to illustrate the usage of persistent storage wi
 The only one requirement is to have a running kubernetes cluster deployed either on-prem or in any cloud providers. 
 
 ## preparing the cluster
-### ingress and cert-manager
-Note: this part is depending of the type of Kubernetes cluster deployment. This repo example has been tested successfully with DigitalOcean Kubernetes Service. 
+### ingress and cert-manager (optional)
+Note: this part is depending of the type of Kubernetes cluster deployment. This repo example has been tested successfully with DigitalOcean Kubernetes Service.  
 Using helm, the following commands have to be perfomed:
 ```
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -48,7 +48,7 @@ spec:
           class: nginx
 ```
 
-### argocd
+### argocd (optional)
 Deploying ArgoCD to illustrate the concept of Continuous Delivery using GitOps.
 ```
 kubectl create namespace argocd
@@ -90,12 +90,4 @@ parameters:
   csi.storage.k8s.io/node-publish-secret-namespace: kube-system
   csi.storage.k8s.io/provisioner-secret-namespace: kube-system
 ```
-
-
-
-
-k get all -n myshiny-app -o wide
-k port-forward svc/myshiny-app-fe-service -n myshiny-app 8081:80 --address
-k delete namespace myshiny-app 
-
 
