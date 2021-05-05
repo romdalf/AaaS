@@ -285,3 +285,18 @@ To apply this satefulset manifest, run the following:
 ```
 kubectl apply -f cd/foodmag-fe-statefulset.yaml
 ```
+
+At this stage, to access the freshly deployed environment, it will require to search on which node the workload is running to get its IP access it via the relevant ports.
+Another approach which is less time consumming would be to simply perform a local forward to access it like we would be within the same network segment:
+```
+kubectl port-forward svc/foodmag-app-fe-service -n foodmag-app 8081:80 [--address local_ip_address] 
+```
+
+What about the storage layer? Persistent volume have been claimed by the workloads and can be checked via:
+```
+kubectl get pvc -n foodmag-app
+```
+and from a StorageOS perspective if more details are needed:
+```
+kubectl exec -n kube-system -it cli -- storageos get volumes -A
+```
