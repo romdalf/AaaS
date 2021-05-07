@@ -169,6 +169,46 @@ Notes:
 - two files are created but both YAML code could be append within the same file based on the above output. 
 
 ### show the running YAML
+To actually deploy the first app configuration, the following command can be executed:
+
+```
+kubectl apply -f myfirstapp/myfirstpvc.yaml
+persistentvolumeclaim/pvc-1 created
+kubectl apply -f myfirstapp/myfirstpod.yaml
+pod/d1 created
+```
+Wow! no fireworks or music? nope... it just did it! 
+
+The results will be two objects that are linked together:
+```
+kubectl get pvc
+NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast           86s
+kubectl get pod
+NAME   READY   STATUS    RESTARTS   AGE
+d1     1/1     Running   0          95s
+```
+
+### illustrate persistent storage
+The goal of this first app is to provide an undestanding of the different objects like PVC, PV, or Pod and then illustrate the ephemeral nature of a Pod. 
+
+Let's connect to the running pod and save some important message on our volume.
+```
+kubectl exec -it d1 -- bash
+root@d1:/# mount |grep mnt
+/var/lib/storageos/volumes/v.692c7205-3fab-4e37-969f-27e0b0268776 on /mnt type ext4 (rw,relatime,stripe=32)
+root@d1:/# echo k8s rocks! > /mnt/motd
+root@d1:/# cat /mnt/motd
+k8s rocks!
+root@d1:/# echo k8s rocks! > /etc/motd
+root@d1:/# cat /etc/motd
+k8s rocks!
+root@d1:/# exit
+```
+
+The important message has been saved at two different places:
+- the famous ```/etc``` directory where the motd file would be expected
+- the ```/mnt``` directory where the persistent volume is mounted
 
 
 ### storageos
