@@ -168,7 +168,7 @@ Notes:
 - note the comment structure of the descriptive configuration file. This is a well-documented standard. 
 - two files are created but both YAML code could be append within the same file based on the above output. 
 
-### show the running YAML
+### show me the running YAML
 To actually deploy the first app configuration, the following command can be executed:
 
 ```
