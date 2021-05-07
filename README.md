@@ -119,6 +119,7 @@ Nodes:        3
 ```
 
 ## my first app
+### show me the YAML
 Before starting to run, let's have a little walk. The following example is from the actual StorageOS self evaluation guide providing two YAML definition for creating a Persistent Volume Claim (PVC) and an application (Pod) that will consume the persistent volume (PV). 
 
 ```myfirstpvc.yaml```:
@@ -162,6 +163,13 @@ spec:
 ```
 
 The above provides a blueprint of our application. It tells that we will be getting a debian container base image with a specific nature (9-slim), that we will run a command once up and that we want to redeem our volume voucher and mounting the volume at ```/mnt```.
+
+Notes:
+- note the comment structure of the descriptive configuration file. This is a well-documented standard. 
+- two files are created but both YAML code could be append within the same file based on the above output. 
+
+### show the running YAML
+
 
 ### storageos
 For the puproses of this demo, the Free For Every Developer edition of Storage is used via the automated deployment (note: this deployment method is not suitable for production usage):
