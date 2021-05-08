@@ -45,7 +45,8 @@ Wait! Be brave, don't just copy/paste the above... curl first, review and then e
 
 The output would like like:
 ```
-rovandep in ~ ❯ curl -sL https://storageos.run |bash
+curl -sL https://storageos.run |bash
+
 Welcome to the StorageOS quick installation script.
 I will install StorageOS version v2.4.0-rc.1 into
 namespace kube-system now. If I encounter any errors
@@ -184,9 +185,10 @@ Notes:
 To actually deploy the first app configuration, the following command can be executed:
 
 ```
-kubectl apply -f myfirstapp/myfirstpvc.yaml
+kubectl apply -f doc/101/myfirstapp/myfirstpvc.yaml
 persistentvolumeclaim/pvc-1 created
-kubectl apply -f myfirstapp/myfirstpod.yaml
+
+kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
 pod/d1 created
 ```
 Wow! no fireworks or music? nope... it just did it! 
@@ -196,6 +198,7 @@ The results will be two objects that are linked together:
 kubectl get pvc
 NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast           86s
+
 kubectl get pod
 NAME   READY   STATUS    RESTARTS   AGE
 d1     1/1     Running   0          95s
@@ -215,9 +218,12 @@ The goal of this first app is to provide an undestanding of the different object
 Let's connect to the running pod and save some important message on our volume.
 ```
 kubectl exec -it d1 -- bash
+
 root@d1:/# mount |grep mnt
 /var/lib/storageos/volumes/v.692c7205-3fab-4e37-969f-27e0b0268776 on /mnt type ext4 (rw,relatime,stripe=32)
+
 root@d1:/# echo k8s rocks! > /mnt/motd
+
 root@d1:/# cat /mnt/motd
 k8s rocks!
 root@d1:/# cat /etc/motd
@@ -228,9 +234,12 @@ individual files in /usr/share/doc/*/copyright.
 
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
+
 root@d1:/# echo k8s rocks! > /etc/motd
+
 root@d1:/# cat /etc/motd
 k8s rocks!
+
 root@d1:/# exit
 ```
 
@@ -242,8 +251,10 @@ Let's destroy the Pod and observe the container image ephemeral nature:
 ```
 kubectl delete pod d1
 pod "d1" deleted
+
 kubectl get pod
 No resources found in default namespace.
+
 kubectl get pvc
 NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast           13m
@@ -251,11 +262,13 @@ pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO      
 The above output confirms that the Pod is delete but the PVC and volume still exist. The beauty of Kubernetes and it's descriptive desired state configuration file is that it can be applied again and the very same Pod will start and attach to the volume:
 
 ```
-kubectl apply -f myfirstapp/myfirstpod.yaml
+kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
 pod/d1 created
-rovandep in DBaaS on  main ↑3 ↓2  ~1 ❯ kubectl get pod
+
+kubectl get pod
 NAME   READY   STATUS              RESTARTS   AGE
 d1     0/1     ContainerCreating   0          4s
+
 kubectl get pod
 NAME   READY   STATUS    RESTARTS   AGE
 d1     1/1     Running   0          12s
@@ -264,11 +277,13 @@ d1     1/1     Running   0          12s
 Let's check on our motd:
 
 ``` 
- kubectl exec -it d1 -- bash
+kubectl exec -it d1 -- bash
 root@d1:/# mount |grep mnt
 /var/lib/storageos/volumes/v.692c7205-3fab-4e37-969f-27e0b0268776 on /mnt type ext4 (rw,relatime,stripe=32)
+
 root@d1:/# cat /mnt/motd
 k8s rocks!
+
 root@d1:/# cat /etc/motd
 
 The programs included with the Debian GNU/Linux system are free software;
@@ -277,6 +292,7 @@ individual files in /usr/share/doc/*/copyright.
 
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
+
 root@d1:/# exit
 ```
 
@@ -355,17 +371,15 @@ parameters:
 
 Time to apply:
 ```
-kubectl apply -f myfirstapp/replica_torageos_storageClass.yaml 
+kubectl apply -f doc/101/storageClass/replica_storageos_storageClass.yaml 
 storageclass.storage.k8s.io/storageos-rep-1 created
-```
-```
+
 kubectl get storageClass 
 NAME                         PROVISIONER                 RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 do-block-storage (default)   dobs.csi.digitalocean.com   Delete          Immediate           true                   43h
 fast                         csi.storageos.com           Delete          Immediate           true                   28h
 storageos-rep-1              csi.storageos.com           Delete          Immediate           true                   6s
-```
-```
+
 kubectl describe storageClass storageos-rep-1
 Name:            storageos-rep-1
 IsDefaultClass:  No
@@ -380,4 +394,66 @@ VolumeBindingMode:     Immediate
 Events:                <none>
 ```
 
-The ```storageClass``` parameters are shown in the describe as ```fsType=ext4,pool=default,storageos.com/replicas=1```.
+The ```storageClass``` parameters are shown in the describe as ```fsType=ext4,pool=default,storageos.com/replicas=1```. The two previous PVC and Pod configuration files are updated to leverage this new ```storageClass```.
+
+```pvc-with-replica.yaml```:
+```yaml
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-2
+spec:
+  storageClassName: "storageos-rep-1"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+```
+```pod-with-pvc-replica.yaml```:
+```yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: d2
+spec:
+  containers:
+    - name: debian
+      image: debian:9-slim
+      command: ["/bin/sleep"]
+      args: [ "3600" ]
+      volumeMounts:
+        - mountPath: /mnt
+          name: v1
+  volumes:
+    - name: v1
+      persistentVolumeClaim:
+        claimName: pvc-2
+```
+Let's apply them:
+```
+kubectl apply -f doc/101/storageClass/pvc-with-replica.yaml 
+persistentvolumeclaim/pvc-2 created
+
+kubectl apply -f doc/101/storageClass/pod-with-pvc-replica.yaml 
+pod/d2 created
+
+kubectl get pod
+NAME   READY   STATUS    RESTARTS   AGE
+d1     1/1     Running   0          56s
+d2     1/1     Running   0          106s
+
+kubectl get pvc
+NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast              28h
+pvc-2   Bound    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            storageos-rep-1   105s
+
+kubectl exec -n kube-system -it cli -- storageos get volume 
+NAMESPACE  NAME                                      SIZE     LOCATION              ATTACHED ON  REPLICAS  AGE          
+default    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c  5.0 GiB  dbaas-8row6 (online)  dbaas-8row6  1/1       3 minutes ago
+default    pvc-f4af80a7-1224-4641-abae-8403e3c9827b  5.0 GiB  dbaas-8rowa (online)  dbaas-8rowa  0/0       1 day ago    
+```
+
+As we can see the new PVC is now leveraging the new created class ```storageos-rep-1``` providing a replica to the workload. The tests realized during ```myfirstapp``` can be done again with the very same results.  On top of this, if the node ```dbaas-8row6``` would suffer a failure, the replica would be elected as primary volume to ensure the Pod can continue to work and access its data.
