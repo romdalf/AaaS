@@ -16,4 +16,5 @@ The content is built as a step by step approach to grow knowledge from basic to 
 
 [101 - basics of persistent storage on k8s](doc/101/)  
 [201 - anatomy of a stateful deployment](doc/201/)
+[301 - gitops to the rescue](doc/301)
 
