@@ -457,3 +457,12 @@ default    pvc-f4af80a7-1224-4641-abae-8403e3c9827b  5.0 GiB  dbaas-8rowa (onlin
 ```
 
 As we can see the new PVC is now leveraging the new created class ```storageos-rep-1``` providing a replica to the workload. The tests realized during ```myfirstapp``` can be done again with the very same results.  On top of this, if the node ```dbaas-8row6``` would suffer a failure, the replica would be elected as primary volume to ensure the Pod can continue to work and access its data.
+
+## conclusions
+k8s and containers are solving a massive amount of infrastructure dependencies. With the above example, it might not be that abvious. The next part of the guide will make sure to highlight the major benefits compared to the legacy way of deployments.
+
+From this 101 part, the followings are to keep in mind:
+- k8s and containers are designed to run out-of-the-boxe stateless applications
+- YAML is picky with indentation, using a good text editor with YAML linting is almost mandatory
+- a cloud native solution like StorageOS provides a k8s native storage solution for stateful applications
+- using k8s with StorageOS allows to address storage needs from YAML templating without needs of any extra knowledge
