@@ -14,6 +14,6 @@ The end goal is to :
 
 The content is built as a step by step approach to grow knowledge from basic to advanced. The only knowledge requirements at the start are basic linux skills and container understanding. 
 
-[101 - basics of persistent storage on k8s](doc/101/README.md)  
+[101 - basics of persistent storage on k8s](doc/101/)  
 [201 - anatomy of a stateful deployment](doc/201/README.md)
 
