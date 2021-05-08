@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: d1
+  name: d2
 spec:
   containers:
     - name: debian
@@ -15,4 +15,4 @@ spec:
   volumes:
     - name: v1
       persistentVolumeClaim:
-        claimName: pvc-1
+        claimName: pvc-2
