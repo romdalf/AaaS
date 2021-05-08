@@ -1,5 +1,3 @@
-![argrocd-sync](https://argocd.doks.myshiny.space/api/badge?name=foodmag-app&revision=true)
-
 # anything-as-a-Service (AaaS)
 This repository content is used to illustrate the deployment or migration of a stateful/legacy application on Kubernetes (k8s) with persistent storage using [StorageOS](https://storageos.com) as cloud native stroage backend.  
 
