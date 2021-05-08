@@ -35,7 +35,7 @@ This output shows a 3 node cluster running a kubernetes version 1.20.2 freshly d
 K8s is designed to support stateless workload natively. To support stateful workload, a persistent storage solution has to be implemented in order to provide a volume to be consummed by the application. The volume will survice the application rescheduling, scaling up/down, or deletion.  
 [StorageOS](https://storageos.com) is cloud native, software-defined storage for running containerized applications in production, running in the cloud, on-prem and in hybrid/multi-cloud environments. 
 
-StorageOS has a free forever developer tier that can be used for such environment or for a development platform. A [self evaluation guide](https://docs.storageos.com/docs/self-eval/) provides the user with a script to do a rapid deployment which will consume local disk space on nodes while providing a fully distributed persistent storage for stateful applications. Remember, this is not suited for a production deployment but performed for testing. 
+[StorageOS](https://storageos.com) has a free forever developer tier that can be used for such environment or for a development platform. A [self evaluation guide](https://docs.storageos.com/docs/self-eval/) provides the user with a script to do a rapid deployment which will consume local disk space on nodes while providing a fully distributed persistent storage for stateful applications. Remember, this is not suited for a production deployment but performed for testing. 
 
 From the admin machine where ```kubectl``` is connected with freshly deployed k8s cluster, the following script can be ran:
 ```
@@ -115,7 +115,7 @@ Nodes:        3
 ```
 
 ## my first app - show me the YAML
-Before starting to run, let's have a little walk. The following example is from the actual StorageOS self evaluation guide providing two YAML definition for creating a Persistent Volume Claim (PVC) and an application (Pod) that will consume the persistent volume (PV). 
+Before starting to run, let's have a little walk. The following example is from the actual [StorageOS](https://storageos.com) self evaluation guide providing two YAML definition for creating a Persistent Volume Claim (PVC) and an application (Pod) that will consume the persistent volume (PV). 
 
 This first configuration file is also perfect to demonstrate the anatomy of YAML body parts:
 
@@ -204,7 +204,7 @@ NAME   READY   STATUS    RESTARTS   AGE
 d1     1/1     Running   0          95s
 ```
 
-Since we are leverage StorageOS, let's have a look at the volume from its view: 
+Since we are leverage [StorageOS](https://storageos.com), let's have a look at the volume from its view: 
 ```
 kubectl exec -n kube-system -it cli -- storageos get volume 
 NAMESPACE  NAME                                      SIZE     LOCATION              ATTACHED ON  REPLICAS  AGE      
@@ -328,7 +328,7 @@ NAME                         PROVISIONER                 RECLAIMPOLICY   VOLUMEB
 do-block-storage (default)   dobs.csi.digitalocean.com   Delete          Immediate           true                   43h
 fast                         csi.storageos.com           Delete          Immediate           true                   28h
 ```
-The output shows two ```storageClass``` including "fast" one which is using our StorageOS cluster. Let's dig for further details with ```kubectl describe```:
+The output shows two ```storageClass``` including "fast" one which is using our [StorageOS](https://storageos.com) cluster. Let's dig for further details with ```kubectl describe```:
 ```
 kubectl describe storageClass fast
 Name:                  fast
@@ -464,5 +464,5 @@ k8s and containers are solving a massive amount of infrastructure dependencies. 
 From this 101 part, the followings are to keep in mind:
 - k8s and containers are designed to run out-of-the-boxe stateless applications
 - YAML is picky with indentation, using a good text editor with YAML linting is almost mandatory
-- a cloud native solution like StorageOS provides a k8s native storage solution for stateful applications
-- using k8s with StorageOS allows to address storage needs from YAML templating without needs of any extra knowledge
+- a cloud native solution like [StorageOS](https://storageos.com) provides a k8s native storage solution for stateful applications
+- using k8s with [StorageOS](https://storageos.com) allows to address storage needs from YAML templating without needs of any extra knowledge
