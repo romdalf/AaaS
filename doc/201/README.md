@@ -12,9 +12,19 @@ In this chapter, a typical CMS application will be deployed using a StatefulSet 
 Drupal is well know solution used by enterprise companies. Being written in PHP, it requires multiple dependencies like system & PHP libraries, an Apache server with PHP module, and a database service. The actual [installation guide](https://www.drupal.org/docs/installing-drupal) is quite long and extensive.
 
 ## foodmag-app
+The next sections will provide a breakdown of the different configuration objects necessary to have a working application.
 
 ## namespace
-Also known as project, a namespace is a logical separation providing the necessary abstract for multi-tenancy. To create a namespace for DBaaS, the following manifest can be applied:
+Also known as project, a namespace provides features like:
+- multi tenancy
+- cluster resources definition via quota
+- grouping objects together
+
+A namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application.  
+
+To create a namespace, the following configuration file can be applied:
+
+```foodmag-namespace.yaml```:
 ```yaml
 ---
 apiVersion: v1
@@ -22,12 +32,12 @@ kind: Namespace
 metadata:
   name: foodmag-app
 ```
-To apply this satefulset manifest, run the following:
+To apply this configuration file, run the following:
 ```
-kubectl apply -f cd/foodmag-namespace.yaml
+kubectl apply -f doc/201/foodmag-app/foodmag-namespace.yaml
 ```
 
-#### postgresql 
+## postgresql 
 Postgresql is the chosen one here. This workload represents perfectly the concept of stateful application as we wish to keep the data in through any failure or life-cycle events. To create such specific workload, a statefulset configuration will be used:
 ```yaml
 --- # Service will allow to expose the postgresql server service to access internally
