@@ -1,4 +1,4 @@
-# 101 - basics of persistent storage on k8s
+# 101 - basics of k8s and persistent storage
 
 ## preparing the cluster
 A good 50% of this repo could be done without having a real k8s cluster and using instead minikube or any similar one node k8s project. However, to make it through the full guide, it would be recommended, especially when looking into persistent storage.  
