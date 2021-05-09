@@ -1,5 +1,5 @@
 # anything-as-a-Service (AaaS)
-This repository content is used to illustrate the anything-as-a-service with the migration of a stateful/legacy application on kubernetes (k8s) with persistent storage using [StorageOS](https://storageos.com) as cloud native stroage backend.  
+This repository content is used to illustrate the anything-as-a-service with the migration of a stateful/legacy application on kubernetes (k8s) with persistent storage using [StorageOS](https://storageos.com) as cloud native storage backend.  
 
 The content is divided in chapters providing a ramping up from basic to advanced hands-on. The only knowledge requirements at the start are basic linux skills and container understanding. 
 
@@ -28,4 +28,3 @@ The content is divided in chapters providing a ramping up from basic to advanced
 [Capstone]() ![draft](https://img.shields.io/badge/status-0%25-red)
 - migrate an existing stateful application from a legacy infrastructure to k8s using cloud patterns
 
-S
