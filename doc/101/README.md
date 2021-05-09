@@ -117,7 +117,7 @@ Nodes:        3
 ## my first app - show me the YAML
 Before starting to run, let's have a little walk. The following example is from the actual [StorageOS](https://storageos.com) self evaluation guide providing two YAML definition for creating a Persistent Volume Claim (PVC) and an application (Pod) that will consume the persistent volume (PV). 
 
-The following diagram shows the expected results:
+The following diagram shows the expected results:  
 
 ![persistent_storage_for_a_pod](images/persistent_storage_for_a_pod.png)
 
@@ -349,6 +349,11 @@ Events:                <none>
 Nothing really super interesting to see, the "fast" class is a simple one volume without any protection. What about adding a new class with one replica.  
 
 Why? Well, in this any setup, including this one, having a volume with no replica expose the application with no resiliency in case of failure. If the volume is being hosted on node 1 and node 1 fails, the application will be rescheduled by k8s to another available healthy node but failed because there is no copy of the application volume. Adding a replica will ensure resiliency and high availability ofr the application.
+
+The following diagram shows the expected results:  
+
+![persistent_storage_with_replica_for_a_pod](images/persistent_storage_with_replica_for_a_pod.png)
+
 
 Here is an example of a one replica storage class ```replica_storageos_storageClass.yaml```:
 ```yaml
