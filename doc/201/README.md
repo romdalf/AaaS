@@ -15,10 +15,13 @@ Drupal is well know solution used by enterprise companies. Being written in PHP,
 The next sections will provide a breakdown of the different configuration objects necessary to have a working application.
 
 ## namespace
-Also known as project, a namespace provides features like:
+Also known as project, a [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) provides features like:
 - multi tenancy
 - cluster resources definition via quota
-- grouping objects together
+- grouping objects together  
+
+k8s is using a couple of default namespaces, numbers and names might be different from one k8s flavor to another.
+
 
 A namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application.  
 
@@ -35,6 +38,15 @@ metadata:
 To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/201/foodmag-app/foodmag-namespace.yaml
+namespace/foodmag-app created
+kubectl get namespaces
+NAME                 STATUS   AGE
+default              Active   3d2h
+foodmag-app          Active   16s
+kube-node-lease      Active   3d2h
+kube-public          Active   3d2h
+kube-system          Active   3d2h
+storageos-etcd       Active   2d11h
 ```
 
 ## postgresql 
