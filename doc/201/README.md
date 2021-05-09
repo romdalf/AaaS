@@ -1,13 +1,16 @@
 # 201 - anatomy of a stateful deployment
 
+Within 101, a simple Pod definition was used to provision a container with a persistent volume,  deleting the pod, the action is direct and definitive but still let the persistent volume usable.  
+From a k8s standpoint, a stateful application is a first class citizen and as such has it's own definition called a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).  
+Note that deleting a StatefulSet, Pod(s) are not deleted but scaled down to 0. Scaling down a Satefulet to 0 could provide a ordered and graceful termination of the pods.
 
-## from legacy deployment to kubenetes stateful workload
-### deployment overview
-While a legacy workload has to be deployed, the activity will require the full understanding of the infrastructure at all layers including, and not limited to, compute, operating system flavor, storage (both local or remote), networking (DNS, IP, load balancer, firewall, ...), package management, sources, along side potential release management and automation software.  
-Considering the above, it is almost impossible to provide a single and unique deployment methodology allowing to deploy in a fully agnostic approach or if only one of the infrastructure component state would change.
 
-Using containers provide from an application standpoint the necessary abstraction layers with a portable image to be deployed on any platform provider running a container runtime like Kubernetes with containerd or cri-o.  
-Using Kubernetes provide from an infrastructure standpoint the necessary abstraction layers with the removal of all infrastructure component considerations rendering agnostic any container deployment.
+
+
+
+
+
+
 
 ### stateful workload
 When deploying a legacy workload or a stateful workload, it requires capability to record data in a persistent way. However, by design and out-of-the-box, Kubernetes doesn't provide any scalable and high available persistent storage option.  
