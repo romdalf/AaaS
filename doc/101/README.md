@@ -117,6 +117,10 @@ Nodes:        3
 ## my first app - show me the YAML
 Before starting to run, let's have a little walk. The following example is from the actual [StorageOS](https://storageos.com) self evaluation guide providing two YAML definition for creating a Persistent Volume Claim (PVC) and an application (Pod) that will consume the persistent volume (PV). 
 
+The following diagram shows the expected results:
+
+![persistent_storage_for_a_pod](images/persistent_storage_for_a_pod.png)
+
 This first configuration file is also perfect to demonstrate the anatomy of YAML body parts:
 
 ```yaml
