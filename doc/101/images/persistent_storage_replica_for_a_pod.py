@@ -8,8 +8,8 @@ with Diagram("Persistent Storage with replica for a Pod", show=False):
     with Cluster("k8s"):
         pod = Pod("d2")
         pvc = PVC("pvc-2")
-        pv1 = PV("pvc-[uuid]-primary")
-        pv2 = PV("pvc-[uuid]-replica")
+        pv1 = PV("pvc-[uuid] (primary)")
+        pv2 = PV("pvc-[uuid] (replica)")
         sc = StorageClass("storageos-rep-1")
         ds = DaemonSet("StorageOS")
 
