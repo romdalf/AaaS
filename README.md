@@ -13,18 +13,18 @@ The content is divided in chapters providing a ramping up from basic to advanced
   - PostgreSQL; a relational database  
 - scaling a stateful application      
 
-[301 - gitops to the rescue](doc/301) ![0%](https://img.shields.io/badge/status-0%25-red)
+[301 - gitops to the rescue](doc/301) ![todo](https://img.shields.io/badge/status-0%25-red)
 - use a continuous deployment approach based on GitOps principals
 
-[401 - multi-cluster capabilities]() ![draft](https://img.shields.io/badge/status-0%25-red)
+[401 - multi-cluster capabilities]() ![todo](https://img.shields.io/badge/status-0%25-red)
 - provide multi-cluster capabilities from an application workload perspective
 - provide multi-cluster capabilities from a DR-like perspective
 
-[501 - securing a stateful deployment]() ![draft](https://img.shields.io/badge/status-0%25-red)
+[501 - securing a stateful deployment]() ![todo](https://img.shields.io/badge/status-0%25-red)
 - secure the deployment 
 - secure the application
 - secure the persistent data
 
-[Capstone]() ![draft](https://img.shields.io/badge/status-0%25-red)
+[Capstone]() ![todo](https://img.shields.io/badge/status-0%25-red)
 - migrate an existing stateful application from a legacy infrastructure to k8s using cloud patterns
 
