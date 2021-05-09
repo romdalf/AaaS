@@ -4,26 +4,16 @@ Within 101, a simple Pod definition was used to provision a container with a per
 From a k8s standpoint, a stateful application is a first class citizen and as such has it's own definition called a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).  
 Note that deleting a StatefulSet, Pod(s) are not deleted but scaled down to 0. Scaling down a Satefulet to 0 could provide a ordered and graceful termination of the pods.
 
+In this chapter, a typical CMS application will be deployed using a StatefulSet and PVCs. This CMS is composed of:
+- a web app written in PHP called Drupal
+- a database using PostgreSQL 
+- Drupal food magazine demo data will be used to highlight persistent storage
 
+Drupal is well know solution used by enterprise companies. Being written in PHP, it requires multiple dependencies like system & PHP libraries, an Apache server with PHP module, and a database service. The actual [installation guide](https://www.drupal.org/docs/installing-drupal) is quite long and extensive.
 
+## foodmag-app
 
-
-
-
-
-
-### stateful workload
-When deploying a legacy workload or a stateful workload, it requires capability to record data in a persistent way. However, by design and out-of-the-box, Kubernetes doesn't provide any scalable and high available persistent storage option.  
-As such, a solution like [StorageOS](https://storageos.com) is required to provide Kubernetes with a cloud native storage solution capable of interacting natively, high available, scalable vertically and horizontally, and secure persistent storage. 
-
-As an example, a typical scenario would be the deletion of the containers running a front-end and/or a database. When recreating the corresponding containers, it will restart with the relevant persistent storage at the last known state at the deletion time. 
-
-### cms drupal with postgresql
-The CMS Drupal is well know solution used by enterprise companies. The CMS is written in PHP, requires multiple libraries, an Apache server with PHP module, and a database service like PostgreSQL. The actual [installation guide](https://www.drupal.org/docs/installing-drupal) is quite long and extensive.
-
-From a container perspective, the following entries will show how to perform a Kubernetes deployment in an incremental way; from a testing approach to a production grade release management one.
-
-#### namespace
+## namespace
 Also known as project, a namespace is a logical separation providing the necessary abstract for multi-tenancy. To create a namespace for DBaaS, the following manifest can be applied:
 ```yaml
 ---
