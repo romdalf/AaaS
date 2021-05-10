@@ -40,7 +40,7 @@ metadata:
 ```
 To apply this configuration file, run the following:
 ```
-kubectl apply -f doc/201/foodmag-app/foodmag-namespace.yaml
+kubectl apply -f doc/201/foodmag-app/foodmag-app-namespace.yaml
 namespace/foodmag-app created
 
 kubectl get namespaces
@@ -136,6 +136,9 @@ spec:
 
 The results will be followings:
 ```
+kubectl apply -f doc/201/foodmag-app/foodmag-app-statefulset.yaml 
+statefulset.apps/foodmag-app configured
+
 kubectl get all -n foodmag-app -o wide
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          11m   10.244.0.29   dbaas-8rowa   <none>           <none>
@@ -239,4 +242,112 @@ Volume Claims:
 Events:          <none>
 ```
 
+## where is my foodmag?
+Despite the fact that both containers have been deployed successfully with their persistent storage, and despite the fact both containers have ports being defined, there is are no exposure for the outside world to access the CMS front-end. 
 
+To do so, a service object needs offer exposure from the outside world to the appropriate container, in this case the ```foodmag-app-cms```. This can be done via the following YAML code:
+
+```yaml 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foodmag-app-cms-service
+  namespace: foodmag-app
+  labels:
+    app: foodmag-app
+    env: prod
+spec:
+  type: NodePort
+  ports:
+   - port: 80
+     nodePort: 30080
+  selector:
+    app: foodmag-app
+    env: prod
+```
+
+The results will be the followings:
+
+```
+kubectl apply -f doc/201/foodmag-app/foodmag-app-cms-service.yaml 
+service/foodmag-app-cms-service created
+
+kubectl get all -n foodmag-app -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
+pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
+
+NAME                              TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+service/foodmag-app-cms-service   NodePort   10.245.253.117   <none>        80:30080/TCP   37s   app=foodmag-app,env=prod
+
+NAME                           READY   AGE   CONTAINERS                        IMAGES
+statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
+```
+
+The above shows the new service being available to expose the CMS front-end TCP port 80 on a node redirecting traffic to the container TCP port 30080.
+
+What about the ```foodmag-app-sql```? Good question! This is indeed the same issue but the main difference is about to radius of exposure. While the CMS needs to be exposed to the outside world, the database has to be exposed only to the CMS.  
+As a matter of fact, if the database service is not created, skipping the next step and going forward with connecting to the CMS will results in failure to configure and deploy the demo data in. This can be done via the following YAML code: 
+
+```yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foodmag-app-sql-service
+  namespace: foodmag-app
+  labels:
+    app: foodmag-app
+    env: prod
+spec:
+  type: ClusterIP
+  ports:
+   - port: 5432
+  selector:
+    app: foodmag-app
+    env: prod
+```
+
+The results will be the followings:
+```
+kubectl apply -f doc/201/foodmag-app/foodmag-app-sql-service.yaml 
+service/foodmag-app-sql-service created
+
+kubectl get all -n foodmag-app -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
+pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
+
+NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+service/foodmag-app-cms-service   NodePort    10.245.253.117   <none>        80:30080/TCP   26m   app=foodmag-app,env=prod
+service/foodmag-app-sql-service   ClusterIP   10.245.211.246   <none>        5432/TCP       7s    app=foodmag-app,env=prod
+
+NAME                           READY   AGE   CONTAINERS                        IMAGES
+statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
+```
+
+
+
+Note at the current state, no external IP is currently assigned, which is expected. For the current time, a specific process will use to access the CMS front-end on a local machine:
+
+```
+ip a
+...
+5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:15:5d:31:47:14 brd ff:ff:ff:ff:ff:ff
+    inet 172.22.135.113/20 brd 172.22.143.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::215:5dff:fe31:4714/64 scope link 
+       valid_lft forever preferred_lft forever
+
+kubectl port-forward -n foodmag-app service/foodmag-app-cms-service 8080:80 --address 172.22.135.113
+Forwarding from 172.22.135.113:8080 -> 80
+```
+
+Open a browser with as URL ```172.22.135.113:8080``` which should show the following:
+
+![foodmag-app browser](images/foodmag-app_browser.png)
+![foodmag-app browser](images/foodmag-app_browser-02.png)
+![foodmag-app browser](images/foodmag-app_browser-03.png)
+![foodmag-app browser](images/foodmag-app_browser-04.png)
+![foodmag-app browser](images/foodmag-app_browser-05.png)
+![foodmag-app browser](images/foodmag-app_browser-06.png)
