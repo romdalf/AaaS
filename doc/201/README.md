@@ -59,30 +59,30 @@ The concept has been introduced at beginning of this chapter. For more details, 
 With no further suspens, here is the YAML for ```foodmag-app``` with some comments:
 ```yaml
 apiVersion: apps/v1
-kind: StatefulSet                               #|> calling the StatefulSet API object
+kind: StatefulSet                               #|> Calling the StatefulSet API object.
 metadata:
-  name: foodmag-app                             #|> the name of our application, it will be used as a reference key for all related objects
-  namespace: foodmag-app                        #|> the name space in which all the configuration objects will exist 
+  name: foodmag-app                             #|> The name of our application, it will be used as a reference key for all related objects.
+  namespace: foodmag-app                        #|> The name space in which all the configuration objects will exist.
 spec:
   selector:
-    matchLabels:                                #|> although no necessary, labels are a good practice to gather more details about what the app 
+    matchLabels:                                #|> Although no necessary, labels are a good practice to gather more details about what the app.
       app: foodmag-app
       env: prod
-  serviceName: foodmag-app                      #|> serviceName is the overall DNS name for the stateful application that could be address as serviceName.namespace.svc.cluster.local
-  replicas: 1                                   #|> number of instances to scale to; if 2, pods will have 2 instances running on two different nodes
-  template:                                     #|> the template is used to defined the desired state of the application
+  serviceName: foodmag-app                      #|> ServiceName is the overall DNS name for the stateful application that could be address as serviceName.namespace.svc.cluster.local
+  replicas: 1                                   #|> Number of instances to scale to; if 2, pods will have 2 instances running on two different nodes.
+  template:                                     #|> The template is used to define the desired state of the application
     metadata:
       labels:
         app: foodmag-app
         env: prod
     spec:
-      containers:                                       #|> this section is used to defined each container desired state.
-        - name: foodmag-app-sql                         #|  Desired state is: a container called foodmag-app-sql based on the latest image of postgres
+      containers:                                       #|> This section is used to define each container desired state.
+        - name: foodmag-app-sql                         #|  Desired state is: a container called foodmag-app-sql based on the latest image of postgres.
           image: postgres:latest                        #|
           ports:
-            - containerPort: 5432                       #|> this will inform that postgres has the port 5432 can be exposed and a name is given
+            - containerPort: 5432                       #|> This will inform that postgres has the port 5432 can be exposed and a name is given.
               name: foodmag-app-sql                     
-          env:                                          #|> this will define environment variables that the container image can leverage to configure
+          env:                                          #|> This will define environment variables that the container image can leverage to configure
             - name: POSTGRES_DB                         #|  the services running in it like here about setting up postgres. 
               value: foodmagappdb                       #|  
             - name: POSTGRES_USER                       #|
@@ -91,36 +91,36 @@ spec:
               value: foodmagpassword                    #|
             - name: PGDATA                              #|
               value: /var/lib/postgresql/data/pgdata    #|
-          volumeMounts:                                 #|> this will defined what PVC to call and where to mount it
+          volumeMounts:                                 #|> This will define the appropriate PVC and its mount point.
             - name: foodmag-app-sql-pvc                 #|
               mountPath: /var/lib/postgresql/data       #|
-        - name: foodmag-app-cms
+        - name: foodmag-app-cms                         #|> Second container for the cms part.
           image: drupal:latest
           ports:
             - containerPort: 30080
               name: foodmag-app-cms
-          volumeMounts:
+          volumeMounts:                                 #|> This will define the appropriate PVC and its mount point.
+            - name: foodmag-app-cms-pvc                 #|  Note the subPath is a special construct to allow a single PVC to have multiple
+              mountPath: /var/www/html/modules          #|  mount points for the same container. 
+              subPath: modules                          #|
             - name: foodmag-app-cms-pvc
-              mountPath: /var/www/html/modules
-              subPath: modules
-            - name: foodmag-app-cms-pv
               mountPath: /var/www/html/profiles
               subPath: profiles
-            - name: foodmag-app-cms-pv
+            - name: foodmag-app-cms-pvc
               mountPath: /var/www/html/themes
               subPath: themes
-  volumeClaimTemplates:
-    - metadata:
+  volumeClaimTemplates:                                 #|> The template is used to define the desired state of the persistent storage.
+    - metadata:                 
         name: foodmag-app-sql-pvc
         labels:
           app: foodmag-app
           env: prod
       spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: "storageos-rep-1"
+        accessModes: ["ReadWriteOnce"]                  #|> AccessMode is a very important topics. It will be covered later in this section.
+        storageClassName: "storageos-rep-1"             #|> This will define the appropriate storageClass with features like replica, encryption, ...
         resources:
           requests:
-            storage: 5Gi
+            storage: 5Gi                                #|> This will define the provisioned disk size of the volume.
     - metadata:
         name: foodmag-app-cms-pvc
         labels:
@@ -132,6 +132,16 @@ spec:
         resources:
           requests:
             storage: 5Gi
+```
+
+The results will be followings:
+```
+k get all -n foodmag-app -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
+pod/foodmag-app-0   2/2     Running   0          11m   10.244.0.29   dbaas-8rowa   <none>           <none>
+
+NAME                           READY   AGE   CONTAINERS                        IMAGES
+statefulset.apps/foodmag-app   1/1     13m   foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
 ```
 
 
