@@ -368,4 +368,5 @@ Installation in progress (with more questions about name, email,...):
 Tadadaaaaaa! Here our website!
 ![foodmag-app browser](images/foodmag-app_browser-05.png)
 
+## Scale up, Scale down... Scale up, Scale down
 
