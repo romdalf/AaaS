@@ -165,6 +165,7 @@ pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO      
 pvc-2   Bound    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            storageos-rep-1   46h
 ```
 This shows the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further in the Security chapter.  
+
 Finally, some objects can't be bound to a specific namespace like the persistent volumes even with an explicit parameters:
 ```
 kubectl get pv -n foodmag-app
@@ -175,6 +176,67 @@ pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            Delete     
 pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            Delete           Bound    default/pvc-1                                   fast                       3d3h
 ```
 
+## what's in the box?
+At the current stage, the StatefulSet created a couple of objects:
+- StatefulSet (1)
+- Persistent Volume Claims (2)
+- Pods (2)
+- Persistent Volumes(2) 
 
+The following command will provide the complete inventory: 
+```
+kubectl describe -n foodmag-app statefulset.apps/foodmag-app
+Name:               foodmag-app
+Namespace:          foodmag-app
+CreationTimestamp:  Mon, 10 May 2021 11:18:35 +0200
+Selector:           app=foodmag-app,env=prod
+Labels:             <none>
+Annotations:        <none>
+Replicas:           1 desired | 1 total
+Update Strategy:    RollingUpdate
+  Partition:        0
+Pods Status:        1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=foodmag-app
+           env=prod
+  Containers:
+   foodmag-app-sql:
+    Image:      postgres:latest
+    Port:       5432/TCP
+    Host Port:  0/TCP
+    Environment:
+      POSTGRES_DB:        foodmagappdb
+      POSTGRES_USER:      foodmagapp
+      POSTGRES_PASSWORD:  foodmagpassword
+      PGDATA:             /var/lib/postgresql/data/pgdata
+    Mounts:
+      /var/lib/postgresql/data from foodmag-app-sql-pvc (rw)
+   foodmag-app-cms:
+    Image:        drupal:latest
+    Port:         30080/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:
+      /var/www/html/modules from foodmag-app-cms-pvc (rw,path="modules")
+      /var/www/html/profiles from foodmag-app-cms-pvc (rw,path="profiles")
+      /var/www/html/themes from foodmag-app-cms-pvc (rw,path="themes")
+  Volumes:  <none>
+Volume Claims:
+  Name:          foodmag-app-sql-pvc
+  StorageClass:  storageos-rep-1
+  Labels:        app=foodmag-app
+                 env=prod
+  Annotations:   <none>
+  Capacity:      5Gi
+  Access Modes:  [ReadWriteOnce]
+  Name:          foodmag-app-cms-pvc
+  StorageClass:  storageos-rep-1
+  Labels:        app=foodmag-app
+                 env=prod
+  Annotations:   <none>
+  Capacity:      5Gi
+  Access Modes:  [ReadWriteOnce]
+Events:          <none>
+```
 
 
