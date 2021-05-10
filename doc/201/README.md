@@ -325,9 +325,11 @@ NAME                           READY   AGE   CONTAINERS                        I
 statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
 ```
 
+Notes:
+- As discussed above, due to the exposure radius, the CMS use a [k8s service](https://kubernetes.io/docs/concepts/services-networking/service/) type ```NodePort``` to expose the service to the outside world while the database is using a ```ClusterIP``` to expose the service only within the cluster bubble.
+- At the current state, no external IP is currently assigned, which is expected. 
 
-
-Note at the current state, no external IP is currently assigned, which is expected. For the current time, a specific process will use to access the CMS front-end on a local machine:
+For the current time, a forwarding process will use to access the CMS front-end on a local machine:
 
 ```
 ip a
@@ -343,11 +345,27 @@ kubectl port-forward -n foodmag-app service/foodmag-app-cms-service 8080:80 --ad
 Forwarding from 172.22.135.113:8080 -> 80
 ```
 
-Open a browser with as URL ```172.22.135.113:8080``` which should show the following:
+Open a browser with as URL ```172.22.135.113:8080``` which should show the following:  
 
-![foodmag-app browser](images/foodmag-app_browser.png)
+Welcome page to install the CMS
+![foodmag-app browser](images/foodmag-app_browser-01.png)
+
+Select Demo to insert the foodmag data
 ![foodmag-app browser](images/foodmag-app_browser-02.png)
+
+Provide the database details (see env details from the statefulset): 
+- select PostgreSQL
+- database name
+- database username
+- database password
+- database service name
+
 ![foodmag-app browser](images/foodmag-app_browser-03.png)
+
+Installation in progress (with more questions about name, email,...):
 ![foodmag-app browser](images/foodmag-app_browser-04.png)
+
+Tadadaaaaaa! Here our website!
 ![foodmag-app browser](images/foodmag-app_browser-05.png)
-![foodmag-app browser](images/foodmag-app_browser-06.png)
+
+
