@@ -136,14 +136,44 @@ spec:
 
 The results will be followings:
 ```
-k get all -n foodmag-app -o wide
+kubectl get all -n foodmag-app -o wide
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          11m   10.244.0.29   dbaas-8rowa   <none>           <none>
 
 NAME                           READY   AGE   CONTAINERS                        IMAGES
 statefulset.apps/foodmag-app   1/1     13m   foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
+
+kubectl get pvc -n foodmag-app
+NAME                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+foodmag-app-cms-pvc-foodmag-app-0   Bound    pvc-7dc38e7a-d28a-4c76-969d-4fe3958a0925   5Gi        RWO            storageos-rep-1   3h44m
+foodmag-app-sql-pvc-foodmag-app-0   Bound    pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            storageos-rep-1   3h44m
 ```
 
+The above command outputs have an explicit usage of namespace. Let's have a look without it:
+```
+kubectl get all
+NAME     READY   STATUS    RESTARTS   AGE
+pod/d1   1/1     Running   46         46h
+pod/d2   1/1     Running   46         46h
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.245.0.1   <none>        443/TCP   3d19h 
+
+kubectl get pvc 
+NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast              3d2h
+pvc-2   Bound    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            storageos-rep-1   46h
+```
+This shows the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further in the Security chapter.  
+Finally, some objects can't be bound to a specific namespace like the persistent volumes even with an explicit parameters:
+```
+kubectl get pv -n foodmag-app
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                           STORAGECLASS      REASON   AGE
+pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            Delete           Bound    default/pvc-2                                   storageos-rep-1            47h
+pvc-7dc38e7a-d28a-4c76-969d-4fe3958a0925   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-cms-pvc-foodmag-app-0   storageos-rep-1            4h30m
+pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-sql-pvc-foodmag-app-0   storageos-rep-1            4h30m
+pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            Delete           Bound    default/pvc-1                                   fast                       3d3h
+```
 
 
 
