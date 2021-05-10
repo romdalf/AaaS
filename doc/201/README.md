@@ -12,7 +12,12 @@ In this chapter, a typical CMS application will be deployed using a StatefulSet 
 Drupal is well know solution used by enterprise companies. Being written in PHP, it requires multiple dependencies like system & PHP libraries, an Apache server with PHP module, and a database service. The actual [installation guide](https://www.drupal.org/docs/installing-drupal) is quite long and extensive.
 
 ## foodmag-app
-The next sections will provide a breakdown of the different configuration objects necessary to have a working application.
+The next sections will provide a breakdown of the different configuration objects necessary to have a working stateful application for production grade usage.
+
+The following diagram shows the expected results:  
+
+![foodmag-app overview](images/foodmag-app_overview.png)
+
 
 ## namespace
 Also known as project, a [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) provides features like:
@@ -48,7 +53,6 @@ kube-public          Active   3d2h
 kube-system          Active   3d2h
 storageos-etcd       Active   2d11h
 ```
-
 ## postgresql 
 Postgresql is the chosen one here. This workload represents perfectly the concept of stateful application as we wish to keep the data in through any failure or life-cycle events. To create such specific workload, a statefulset configuration will be used:
 ```yaml
