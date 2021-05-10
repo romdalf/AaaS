@@ -18,15 +18,13 @@ The following diagram shows the expected results:
 
 ![foodmag-app overview](images/foodmag-app_overview.png)
 
-
 ## namespace
 Also known as project, a [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) provides features like:
 - multi tenancy
 - cluster resources definition via quota
 - grouping objects together  
 
-k8s is using a couple of default namespaces, numbers and names might be different from one k8s flavor to another.
-
+k8s is using a set of default namespaces, names might be different from one k8s flavor to another, to provide a clear segmentation between software components.
 
 A namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application.  
 
@@ -44,6 +42,7 @@ To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/201/foodmag-app/foodmag-namespace.yaml
 namespace/foodmag-app created
+
 kubectl get namespaces
 NAME                 STATUS   AGE
 default              Active   3d2h
@@ -53,6 +52,94 @@ kube-public          Active   3d2h
 kube-system          Active   3d2h
 storageos-etcd       Active   2d11h
 ```
+
+## statefulset 
+The concept has been introduced at beginning of this chapter. For more details, do not hesitate to browse the [k8s statefulset documentation](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/). 
+
+With no further suspens, here is the YAML for ```foodmag-app``` with some comments:
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet                               #|> calling the StatefulSet API object
+metadata:
+  name: foodmag-app                             #|> the name of our application, it will be used as a reference key for all related objects
+  namespace: foodmag-app                        #|> the name space in which all the configuration objects will exist 
+spec:
+  selector:
+    matchLabels:                                #|> although no necessary, labels are a good practice to gather more details about what the app 
+      app: foodmag-app
+      env: prod
+  serviceName: foodmag-app                      #|> serviceName is the overall DNS name for the stateful application that could be address as serviceName.namespace.svc.cluster.local
+  replicas: 1                                   #|> number of instances to scale to; if 2, pods will have 2 instances running on two different nodes
+  template:                                     #|> the template is used to defined the desired state of the application
+    metadata:
+      labels:
+        app: foodmag-app
+        env: prod
+    spec:
+      containers:                                       #|> this section is used to defined each container desired state.
+        - name: foodmag-app-sql                         #|  Desired state is: a container called foodmag-app-sql based on the latest image of postgres
+          image: postgres:latest                        #|
+          ports:
+            - containerPort: 5432                       #|> this will inform that postgres has the port 5432 can be exposed and a name is given
+              name: foodmag-app-sql                     
+          env:                                          #|> this will define environment variables that the container image can leverage to configure
+            - name: POSTGRES_DB                         #|  the services running in it like here about setting up postgres. 
+              value: foodmagappdb                       #|  
+            - name: POSTGRES_USER                       #|
+              value: foodmagapp                         #|
+            - name: POSTGRES_PASSWORD                   #|
+              value: foodmagpassword                    #|
+            - name: PGDATA                              #|
+              value: /var/lib/postgresql/data/pgdata    #|
+          volumeMounts:                                 #|> this will defined what PVC to call and where to mount it
+            - name: foodmag-app-sql-pvc                 #|
+              mountPath: /var/lib/postgresql/data       #|
+        - name: foodmag-app-cms
+          image: drupal:latest
+          ports:
+            - containerPort: 30080
+              name: foodmag-app-cms
+          volumeMounts:
+            - name: foodmag-app-cms-pvc
+              mountPath: /var/www/html/modules
+              subPath: modules
+            - name: foodmag-app-cms-pv
+              mountPath: /var/www/html/profiles
+              subPath: profiles
+            - name: foodmag-app-cms-pv
+              mountPath: /var/www/html/themes
+              subPath: themes
+  volumeClaimTemplates:
+    - metadata:
+        name: foodmag-app-sql-pvc
+        labels:
+          app: foodmag-app
+          env: prod
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "storageos-rep-1"
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: foodmag-app-cms-pvc
+        labels:
+          app: foodmag-app
+          env: prod
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "storageos-rep-1"
+        resources:
+          requests:
+            storage: 5Gi
+```
+
+
+
+
+
+
+
 ## postgresql 
 Postgresql is the chosen one here. This workload represents perfectly the concept of stateful application as we wish to keep the data in through any failure or life-cycle events. To create such specific workload, a statefulset configuration will be used:
 ```yaml
