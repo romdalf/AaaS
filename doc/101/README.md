@@ -1,5 +1,121 @@
 # 101 - basics of k8s and persistent storage
 
+
+on each node edit ```/etc/hosts``` file and append at the end:
+```
+k3s01_IP  k3s01_hostname
+k3s02_IP  k3s02_hostname
+k3s03_IP  k3s03_hostname
+```
+
+update and upgrade each node on each node
+```
+apt update 
+apt upgrade -y
+reboot
+```
+
+once previous are done, run the following on the first node to install k3s as a master node:
+```
+curl -sfL https://get.k3s.io | sh -
+[INFO]  Finding release for channel stable
+[INFO]  Using v1.20.6+k3s1 as release
+[INFO]  Downloading hash https://github.com/k3s-io/k3s/releases/download/v1.20.6+k3s1/sha256sum-amd64.txt
+[INFO]  Downloading binary https://github.com/k3s-io/k3s/releases/download/v1.20.6+k3s1/k3s
+[INFO]  Verifying binary download
+[INFO]  Installing k3s to /usr/local/bin/k3s
+[INFO]  Creating /usr/local/bin/kubectl symlink to k3s
+[INFO]  Creating /usr/local/bin/crictl symlink to k3s
+[INFO]  Creating /usr/local/bin/ctr symlink to k3s
+[INFO]  Creating killall script /usr/local/bin/k3s-killall.sh
+[INFO]  Creating uninstall script /usr/local/bin/k3s-uninstall.sh
+[INFO]  env: Creating environment file /etc/systemd/system/k3s.service.env
+[INFO]  systemd: Creating service file /etc/systemd/system/k3s.service
+[INFO]  systemd: Enabling k3s unit
+Created symlink /etc/systemd/system/multi-user.target.wants/k3s.service → /etc/systemd/system/k3s.service.
+[INFO]  systemd: Starting k3s
+```
+
+The script also install all the necesary utilities to interact with the k8s cluster like ```kubectl``` which will give a status about the current setup: 
+```
+kubectl get nodes
+NAME    STATUS   ROLES                  AGE   VERSION
+k3s01   Ready    control-plane,master   25s   v1.20.6+k3s1
+```
+
+The kubeconfig file is available here:
+```
+cat /etc/rancher/k3s/k3s.yaml
+```
+
+When deploy a worker, the k3s script will require a token and the master URL. The token is available at the following location:
+```
+cat /var/lib/rancher/k3s/server/
+```
+
+Connect to one the worker node and perform the following:
+```
+curl -sfL https://get.k3s.io | K3S_URL="https://master_ip_or_fqdn:6443" K3S_TOKEN="token" sh -
+[INFO]  Finding release for channel stable
+[INFO]  Using v1.20.6+k3s1 as release
+[INFO]  Downloading hash https://github.com/k3s-io/k3s/releases/download/v1.20.6+k3s1/sha256sum-amd64.txt
+[INFO]  Downloading binary https://github.com/k3s-io/k3s/releases/download/v1.20.6+k3s1/k3s
+[INFO]  Verifying binary download
+[INFO]  Installing k3s to /usr/local/bin/k3s
+[INFO]  Creating /usr/local/bin/kubectl symlink to k3s
+[INFO]  Creating /usr/local/bin/crictl symlink to k3s
+[INFO]  Creating /usr/local/bin/ctr symlink to k3s
+[INFO]  Creating killall script /usr/local/bin/k3s-killall.sh
+[INFO]  Creating uninstall script /usr/local/bin/k3s-agent-uninstall.sh
+[INFO]  env: Creating environment file /etc/systemd/system/k3s-agent.service.env
+[INFO]  systemd: Creating service file /etc/systemd/system/k3s-agent.service
+[INFO]  systemd: Enabling k3s-agent unit
+Created symlink /etc/systemd/system/multi-user.target.wants/k3s-agent.service → /etc/systemd/system/k3s-agent.service.
+[INFO]  systemd: Starting k3s-agent
+```
+
+Check the results via ```kubectl```: 
+```
+kubectl get nodes
+NAME    STATUS   ROLES                  AGE     VERSION
+k3s01   Ready    control-plane,master   8m12s   v1.20.6+k3s1
+k3s02   Ready    <none>                 17s     v1.20.6+k3s1
+```
+
+Repeat on the every other worker to be added:
+```
+curl -sfL https://get.k3s.io | K3S_URL="https://master_ip_or_fqdn:6443" K3S_TOKEN="token" sh -
+[INFO]  Finding release for channel stable
+[INFO]  Using v1.20.6+k3s1 as release
+[INFO]  Downloading hash https://github.com/k3s-io/k3s/releases/download/v1.20.6+k3s1/sha256sum-amd64.txt
+[INFO]  Skipping binary downloaded, installed k3s matches hash
+[INFO]  Skipping /usr/local/bin/kubectl symlink to k3s, already exists
+[INFO]  Skipping /usr/local/bin/crictl symlink to k3s, already exists
+[INFO]  Skipping /usr/local/bin/ctr symlink to k3s, already exists
+[INFO]  Creating killall script /usr/local/bin/k3s-killall.sh
+[INFO]  Creating uninstall script /usr/local/bin/k3s-agent-uninstall.sh
+[INFO]  env: Creating environment file /etc/systemd/system/k3s-agent.service.env
+[INFO]  systemd: Creating service file /etc/systemd/system/k3s-agent.service
+[INFO]  systemd: Enabling k3s-agent unit
+Created symlink /etc/systemd/system/multi-user.target.wants/k3s-agent.service → /etc/systemd/system/k3s-agent.service.
+[INFO]  systemd: Starting k3s-agent
+```
+
+Check the results via ```kubectl```: 
+```
+kubectl get nodes
+NAME    STATUS   ROLES                  AGE   VERSION
+k3s02   Ready    <none>                 24m   v1.20.6+k3s1
+k3s01   Ready    control-plane,master   32m   v1.20.6+k3s1
+k3s03   Ready    <none>                 14s   v1.20.6+k3s1
+
+
+
+
+
+
+
+
 ## preparing the cluster
 A good 50% of this repo could be done without having a real k8s cluster and using instead minikube or any similar one node k8s project. However, to make it through the full guide, it would be recommended, especially when looking into persistent storage.  
 
