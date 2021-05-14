@@ -1,5 +1,7 @@
 # 201 - anatomy of a stateful deployment
 
+## foodmag-app
+
 Within 101, a simple Pod definition was used to provision a container with a persistent volume,  deleting the pod, the action is direct and definitive but still let the persistent volume usable.  
 From a k8s standpoint, a stateful application is a first class citizen and as such has it's own definition called a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).  
 Note that deleting a StatefulSet, Pod(s) are not deleted but scaled down to 0. Scaling down a Satefulet to 0 could provide a ordered and graceful termination of the pods.
@@ -11,14 +13,39 @@ In this chapter, a typical CMS application will be deployed using a StatefulSet 
 
 Drupal is well know solution used by enterprise companies. Being written in PHP, it requires multiple dependencies like system & PHP libraries, an Apache server with PHP module, and a database service. The actual [installation guide](https://www.drupal.org/docs/installing-drupal) is quite long and extensive.
 
-## foodmag-app
 The next sections will provide a breakdown of the different configuration objects necessary to have a working stateful application for production grade usage.
 
 The following diagram shows the expected results:  
 
 ![foodmag-app overview](images/foodmag-app_overview.png)
 
-## namespace
+## the old empire
+With this short section, let's imagine would it would be done provision, configure and deploy such a simple architecture. This breakdown could be considered as a worklow from an automation and release tooling perspective:
+
+1. define two network zones (nightmare time!)
+2. get IP addresses (hoping there is an IPAM)
+3. configure DNS
+4. provision at least 2 (virtual) machines
+5. update the operating systems to the latest corporate release if golden image is not yet
+6. configure the operating systems with the latest and greatest access policies
+7. deploy backup, security and observability packages
+8. configure additional storage for both (virtual) machines
+9. deploy DB service on one (virtual)machine 
+9. deploy CMS service on one (virtual)machine
+10. check connectivity and adjust firewall
+11. request SSL certificate for external exposure
+12. configure load balancer for external exposure
+13. check external exposure
+15. Dev team to access, verify and confirm all good and most likely requests some additional libs or packages to be deployed
+16. Dev team to load the contents 
+17. configure DB backup
+18. configure system backup
+
+By experience, the above would have a lead time between 1 week (impressive) up to months!  
+Let's keep these steps above in mind when going through the same deployment with k8s.
+
+## the new republic
+## namespace - segmentation and multi-tenancy
 Also known as project, a [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) provides features like:
 - multi tenancy
 - cluster resources definition via quota
@@ -26,11 +53,9 @@ Also known as project, a [namespace](https://kubernetes.io/docs/concepts/overvie
 
 k8s is using a set of default namespaces, names might be different from one k8s flavor to another, to provide a clear segmentation between software components.
 
-A namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application.  
+A namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application. To create a namespace, the following configuration file can be applied:
 
-To create a namespace, the following configuration file can be applied:
-
-```foodmag-namespace.yaml```:
+```foodmag-app-namespace.yaml```:
 ```yaml
 ---
 apiVersion: v1
@@ -38,11 +63,19 @@ kind: Namespace
 metadata:
   name: foodmag-app
 ```
+The above YAML is a perfect small example to present the structure:  
+1. reference to an API version (it could also refer to a specific API set like ```apps/vi```)
+2. reference to an API object like here ```Namespace``` to create, read, update, delete (CRUD)
+3. reference to metadata which are usually to give/refer to a name to an object (and more)
+4. indentation, indentation, indentation!
+
 To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/201/foodmag-app/foodmag-app-namespace.yaml
 namespace/foodmag-app created
-
+```
+The results will be followings:
+```
 kubectl get namespaces
 NAME                 STATUS   AGE
 default              Active   3d2h
@@ -53,10 +86,10 @@ kube-system          Active   3d2h
 storageos-etcd       Active   2d11h
 ```
 
-## statefulset 
-The concept has been introduced at beginning of this chapter. For more details, do not hesitate to browse the [k8s statefulset documentation](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/). 
+## statefulset - the desired state of a stateful application
+The concept has been introduced at beginning of this chapter. For more details, do not hesitate to browse the [k8s statefulset documentation](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/). With no further suspens, here is the YAML for the StatefulSet with some comments.
 
-With no further suspens, here is the YAML for ```foodmag-app``` with some comments:
+```foodmag-app-statefulset.yaml```:
 ```yaml
 apiVersion: apps/v1
 kind: StatefulSet                               #|> Calling the StatefulSet API object.
@@ -138,21 +171,24 @@ The results will be followings:
 ```
 kubectl apply -f doc/201/foodmag-app/foodmag-app-statefulset.yaml 
 statefulset.apps/foodmag-app configured
+```
 
+```
 kubectl get all -n foodmag-app -o wide
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          11m   10.244.0.29   dbaas-8rowa   <none>           <none>
 
 NAME                           READY   AGE   CONTAINERS                        IMAGES
 statefulset.apps/foodmag-app   1/1     13m   foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
-
+```
+The StatefulSet created one Pod with 2 running containers; one for the ```foodmag-app-sql``` and one for ```foodmag-app-cms```, shown within the StatefuleSet output.
+```
 kubectl get pvc -n foodmag-app
 NAME                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 foodmag-app-cms-pvc-foodmag-app-0   Bound    pvc-7dc38e7a-d28a-4c76-969d-4fe3958a0925   5Gi        RWO            storageos-rep-1   3h44m
 foodmag-app-sql-pvc-foodmag-app-0   Bound    pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            storageos-rep-1   3h44m
 ```
-
-The above command outputs have an explicit usage of namespace. Let's have a look without it:
+Two PVCs have been provisioned for each containers. Note that the above command outputs have an explicit usage of namespace ```foodmag-app```. Let's have a look without it:
 ```
 kubectl get all
 NAME     READY   STATUS    RESTARTS   AGE
@@ -161,15 +197,16 @@ pod/d2   1/1     Running   46         46h
 
 NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 service/kubernetes   ClusterIP   10.245.0.1   <none>        443/TCP   3d19h 
-
+```
+Not referring to a namespace will present the objects existing/created within the namespace called ```default``` and same goes for the PVCs:
+```
 kubectl get pvc 
 NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast              3d2h
 pvc-2   Bound    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            storageos-rep-1   46h
 ```
-This shows the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further in the Security chapter.  
 
-Finally, some objects can't be bound to a specific namespace like the persistent volumes even with an explicit parameters:
+Note that some objects can't be not attached to a specific namespace like the persistent volumes created from the PVCs even if explicitly requested with the ```foodmag-app``` namespace:
 ```
 kubectl get pv -n foodmag-app
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                           STORAGECLASS      REASON   AGE
@@ -179,7 +216,9 @@ pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            Delete     
 pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            Delete           Bound    default/pvc-1                                   fast                       3d3h
 ```
 
-## what's in the box?
+This illustrates the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further within the Security chapter (501).
+
+## statefulset - what's in the box?
 At the current stage, the StatefulSet created a couple of objects:
 - StatefulSet (1)
 - Persistent Volume Claims (2)
@@ -242,11 +281,12 @@ Volume Claims:
 Events:          <none>
 ```
 
-## where is my foodmag?
+## statefulset - where is my foodmag?
 Despite the fact that both containers have been deployed successfully with their persistent storage, and despite the fact both containers have ports being defined, there is are no exposure for the outside world to access the CMS front-end. 
 
 To do so, a service object needs offer exposure from the outside world to the appropriate container, in this case the ```foodmag-app-cms```. This can be done via the following YAML code:
 
+```foodmag-app-cms-service.yaml```:
 ```yaml 
 ---
 apiVersion: v1
@@ -272,7 +312,8 @@ The results will be the followings:
 ```
 kubectl apply -f doc/201/foodmag-app/foodmag-app-cms-service.yaml 
 service/foodmag-app-cms-service created
-
+```
+```
 kubectl get all -n foodmag-app -o wide
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
@@ -287,8 +328,10 @@ statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   p
 The above shows the new service being available to expose the CMS front-end TCP port 80 on a node redirecting traffic to the container TCP port 30080.
 
 What about the ```foodmag-app-sql```? Good question! This is indeed the same issue but the main difference is about to radius of exposure. While the CMS needs to be exposed to the outside world, the database has to be exposed only to the CMS.  
+
 As a matter of fact, if the database service is not created, skipping the next step and going forward with connecting to the CMS will results in failure to configure and deploy the demo data in. This can be done via the following YAML code: 
 
+```foodmag-app-sql-service.yaml```:
 ```yaml
 ---
 apiVersion: v1
@@ -312,7 +355,8 @@ The results will be the followings:
 ```
 kubectl apply -f doc/201/foodmag-app/foodmag-app-sql-service.yaml 
 service/foodmag-app-sql-service created
-
+```
+```
 kubectl get all -n foodmag-app -o wide
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
@@ -328,6 +372,7 @@ statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   p
 Notes:
 - As discussed above, due to the exposure radius, the CMS use a [k8s service](https://kubernetes.io/docs/concepts/services-networking/service/) type ```NodePort``` to expose the service to the outside world while the database is using a ```ClusterIP``` to expose the service only within the cluster bubble.
 - At the current state, no external IP is currently assigned, which is expected. 
+- The Service manifests could be added at the StatefulSet one to provide a single configuration file.
 
 For the current time, a forwarding process will use to access the CMS front-end on a local machine:
 
@@ -340,7 +385,8 @@ ip a
        valid_lft forever preferred_lft forever
     inet6 fe80::215:5dff:fe31:4714/64 scope link 
        valid_lft forever preferred_lft forever
-
+```
+```
 kubectl port-forward -n foodmag-app service/foodmag-app-cms-service 8080:80 --address 172.22.135.113
 Forwarding from 172.22.135.113:8080 -> 80
 ```
