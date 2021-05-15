@@ -3,6 +3,7 @@
 # foodmag - a blog about food!
 
 Within 101, a simple Pod definition was used to provision a container with a persistent volume,  deleting the pod, the action is direct and definitive but still let the persistent volume usable.  
+
 From a k8s standpoint, a stateful application is a first class citizen and as such has it's own definition called a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).  
 Note that deleting a StatefulSet, Pod(s) are not deleted but scaled down to 0. Scaling down a Satefulet to 0 could provide a ordered and graceful termination of the pods.
 
@@ -43,7 +44,6 @@ With this short section, let's imagine would it would be done provision, configu
 1. configure system level backup
 
 By experience, the above would have a lead time between 1 week (impressive) up to months!  
-Let's keep these steps above in mind when going through the same deployment with k8s.
 
 ## the new republic
 Taking the above into consideration, let's try to build a table to address each elements from one world to another. 
