@@ -194,11 +194,12 @@ spec:
 To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-statefulset.yaml 
-statefulset.apps/foodmag-app configured
 ```
 The results will be followings:
 ```
 kubectl get all -n foodmag-app -o wide
+```
+```
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          11m   10.244.0.29   dbaas-8rowa   <none>           <none>
 
@@ -218,6 +219,8 @@ How does it translate into a CLI investigation?
 ```StatefulSet```:
 ```
 kubectl describe -n foodmag-app statefulset.apps/foodmag-app
+```
+```
 Name:               foodmag-app
 Namespace:          foodmag-app
 CreationTimestamp:  Mon, 10 May 2021 11:18:35 +0200
@@ -274,6 +277,8 @@ Events:          <none>
 ```Pod```
 ```
 kubectl describe -n foodmag-app pod/foodmag-app-0
+```
+```
 Name:         foodmag-app-0
 Namespace:    foodmag-app
 Priority:     0
@@ -366,6 +371,8 @@ Events:
 ```PVC```:
 ```
 kubectl get pvc -n foodmag-app -o wide
+```
+```
 NAME                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE   VOLUMEMODE
 foodmag-app-cms-pvc-foodmag-app-0   Bound    pvc-d3b7aaa5-1ea1-4684-8679-0299427ad2f3   5Gi        RWO            storageos-rep-1   46m   Filesystem
 foodmag-app-sql-pvc-foodmag-app-0   Bound    pvc-101a37ba-ccd3-456d-9657-c3a4749bb94b   5Gi        RWO            storageos-rep-1   46m   Filesystem
@@ -374,6 +381,8 @@ foodmag-app-sql-pvc-foodmag-app-0   Bound    pvc-101a37ba-ccd3-456d-9657-c3a4749
 ```PV```
 ```
 kubectl get pv -n foodmag-app -o wide
+```
+```
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                           STORAGECLASS      REASON   AGE     VOLUMEMODE
 pvc-101a37ba-ccd3-456d-9657-c3a4749bb94b   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-sql-pvc-foodmag-app-0   storageos-rep-1            49m     Filesystem
 pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            Delete           Bound    default/pvc-2                                   storageos-rep-1            6d20h   Filesystem
@@ -414,11 +423,13 @@ spec:
 The results will be the followings:
 
 ```
-kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-cms-service.yaml 
-service/foodmag-app-cms-service created
-```
+kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-cms-service.yaml
+``` 
+
 ```
 kubectl get all -n foodmag-app -o wide
+```
+```
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
 
@@ -458,10 +469,11 @@ spec:
 The results will be the followings:
 ```
 kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-sql-service.yaml 
-service/foodmag-app-sql-service created
 ```
 ```
 kubectl get all -n foodmag-app -o wide
+```
+```
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
 pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
 
@@ -482,7 +494,8 @@ For the current time, a forwarding process will use to access the CMS front-end 
 
 ```
 ip a
-...
+```
+```
 5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
     link/ether 00:15:5d:31:47:14 brd ff:ff:ff:ff:ff:ff
     inet 172.22.135.113/20 brd 172.22.143.255 scope global eth0
@@ -492,7 +505,6 @@ ip a
 ```
 ```
 kubectl port-forward -n foodmag-app service/foodmag-app-cms-service 8080:80 --address 172.22.135.113
-Forwarding from 172.22.135.113:8080 -> 80
 ```
 
 Open a browser with as URL ```172.22.135.113:8080``` which should show the following:  
