@@ -87,15 +87,15 @@ kind: Namespace
 metadata:
   name: foodmag-app
 ```
-The above YAML is a perfect small example to present the structure:  
-1. reference to an API version (it could also refer to a specific API set like ```apps/vi```)
-1. reference to an API object like here ```Namespace``` to create, read, update, delete (CRUD)
-1. reference to metadata which are usually to give/refer to a name to an object (and more)
+The above YAML is a perfect small sized example to present the structure:  
+1. reference to an API version (it could also refer to a specific API set like ```apps/v1```)
+1. reference to an API object, ```Namespace```, CRUD operations
+1. reference to metadata defining a name for the obeject 
 1. indentation, indentation, indentation!
 
 To apply this configuration file, run the following:
 ```
-kubectl apply -f doc/201/foodmag-app/foodmag-app-namespace.yaml
+kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-namespace.yaml
 namespace/foodmag-app created
 ```
 The results will be followings:
@@ -116,20 +116,20 @@ The concept has been introduced at beginning of this chapter. For more details, 
 ```foodmag-app-statefulset.yaml```:
 ```yaml
 apiVersion: apps/v1
-kind: StatefulSet                               #|> Calling the StatefulSet API object.
+kind: StatefulSet                                       #|> Calling the StatefulSet API object.
 metadata:
-  name: foodmag-app                             #|> The name of our application, it will be used as a reference key for all related objects.
-  namespace: foodmag-app                        #|> The name space in which all the configuration objects will exist.
+  name: foodmag-app                                     #|> The name of our application, it will be used as a reference key for all related objects.
+  namespace: foodmag-app                                #|> The name space in which all (almost) objects will exist.
 spec:
   selector:
-    matchLabels:                                #|> Although no necessary, labels are a good practice to gather more details about what the app.
+    matchLabels:                                        #|> Another kind of labels to refer to when configuring other objects like service as example
       app: foodmag-app
       env: prod
-  serviceName: foodmag-app                      #|> ServiceName is the overall DNS name for the stateful application that could be address as serviceName.namespace.svc.cluster.local
-  replicas: 1                                   #|> Number of instances to scale to; if 2, pods will have 2 instances running on two different nodes.
-  template:                                     #|> The template is used to define the desired state of the application
+  serviceName: foodmag-app                              #|> ServiceName is the DNS name, serviceName-[id], to address the application with
+  replicas: 1                                           #|> Number of instances to scale to; if 2, pods will have 2 instances running on two different nodes.
+  template:                                             #|> The template is used to define the desired state of the application
     metadata:
-      labels:
+      labels:                                           #|> Labels allows to ease searches like "show all prod objects"
         app: foodmag-app
         env: prod
     spec:
@@ -160,15 +160,15 @@ spec:
             - name: foodmag-app-cms-pvc                 #|  Note the subPath is a special construct to allow a single PVC to have multiple
               mountPath: /var/www/html/modules          #|  mount points for the same container. 
               subPath: modules                          #|
-            - name: foodmag-app-cms-pvc
-              mountPath: /var/www/html/profiles
-              subPath: profiles
-            - name: foodmag-app-cms-pvc
-              mountPath: /var/www/html/themes
-              subPath: themes
-  volumeClaimTemplates:                                 #|> The template is used to define the desired state of the persistent storage.
+            - name: foodmag-app-cms-pvc                 #|
+              mountPath: /var/www/html/profiles         #|
+              subPath: profiles                         #|
+            - name: foodmag-app-cms-pvc                 #|
+              mountPath: /var/www/html/themes           #|
+              subPath: themes                           #|
+  volumeClaimTemplates:                                 #|> A special PVC template used to define the desired state for persistent storage.
     - metadata:                 
-        name: foodmag-app-sql-pvc
+        name: foodmag-app-sql-pvc                       #|> PVC name prefix resulting in prefix-ServiceName-[id]
         labels:
           app: foodmag-app
           env: prod
@@ -179,7 +179,7 @@ spec:
           requests:
             storage: 5Gi                                #|> This will define the provisioned disk size of the volume.
     - metadata:
-        name: foodmag-app-cms-pvc
+        name: foodmag-app-cms-pvc                       #|> Second PVC definition
         labels:
           app: foodmag-app
           env: prod
@@ -191,12 +191,12 @@ spec:
             storage: 5Gi
 ```
 
-The results will be followings:
+To apply this configuration file, run the following:
 ```
-kubectl apply -f doc/201/foodmag-app/foodmag-app-statefulset.yaml 
+kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-statefulset.yaml 
 statefulset.apps/foodmag-app configured
 ```
-
+The results will be followings:
 ```
 kubectl get all -n foodmag-app -o wide
 NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
@@ -334,7 +334,7 @@ spec:
 The results will be the followings:
 
 ```
-kubectl apply -f doc/201/foodmag-app/foodmag-app-cms-service.yaml 
+kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-cms-service.yaml 
 service/foodmag-app-cms-service created
 ```
 ```
@@ -377,7 +377,7 @@ spec:
 
 The results will be the followings:
 ```
-kubectl apply -f doc/201/foodmag-app/foodmag-app-sql-service.yaml 
+kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-sql-service.yaml 
 service/foodmag-app-sql-service created
 ```
 ```
