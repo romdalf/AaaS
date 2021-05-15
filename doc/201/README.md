@@ -61,7 +61,7 @@ Taking the above into consideration, let's try to build a table to address each 
 
 Notes: 
 - ```abstracted by k8s platform``` means the necessary components are deployed and available to developers using k8s API object constructs like annotations, labels, API objects, ... 
-- \* should be totally abstracted but some organizations wants control SSL and load balancer configuration mostly because of lack of trust and/or automation skills.
+- ```*``` should be totally abstracted but some organizations wants control SSL and load balancer configuration mostly because of lack of trust and/or automation skills.
 
 # statful application deployment
 
