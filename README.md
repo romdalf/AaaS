@@ -7,7 +7,7 @@ The content is divided in chapters providing a ramping up from basic to advanced
 | Chapter  | Title | Status |
 | --- | --- | --- | 
 | [101](doc/101/) | basics of k8s and persistent storage | ![done](https://img.shields.io/badge/status-100%25-green)|
-| [201](doc/201/) | anatomy of a stateful deployment | ![draft](https://img.shields.io/badge/status-50%25-yellow) |
+| [201](doc/201/) | anatomy of a stateful deployment | ![draft](https://img.shields.io/badge/status-75%25-yellow) |
 | [301]() | gitops to the rescue | ![todo](https://img.shields.io/badge/status-0%25-red) |
 | [401]() | multi-cluster capabilities | ![todo](https://img.shields.io/badge/status-0%25-red) |
 | [501]() | securing a stateful deployment | ![todo](https://img.shields.io/badge/status-0%25-red) |
