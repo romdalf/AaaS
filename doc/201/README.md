@@ -1,6 +1,6 @@
 # 201 - anatomy of a stateful deployment
 
-## foodmag-app
+# foodmag - a blog about food!
 
 Within 101, a simple Pod definition was used to provision a container with a persistent volume,  deleting the pod, the action is direct and definitive but still let the persistent volume usable.  
 From a k8s standpoint, a stateful application is a first class citizen and as such has it's own definition called a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).  
@@ -15,45 +15,69 @@ Drupal is well know solution used by enterprise companies. Being written in PHP,
 
 The next sections will provide a breakdown of the different configuration objects necessary to have a working stateful application for production grade usage.
 
-The following diagram shows the expected results:  
+The following diagram shows the expected results, each discrete elements will be explained and configured:  
 
-![foodmag-app overview](images/foodmag-app_overview.png)
+![foodmag overview](images/foodmag-app_overview.png)
 
 ## the old empire
 With this short section, let's imagine would it would be done provision, configure and deploy such a simple architecture. This breakdown could be considered as a worklow from an automation and release tooling perspective:
 
 1. define two network zones (nightmare time!)
-2. get IP addresses (hoping there is an IPAM)
-3. configure DNS
-4. provision at least 2 (virtual) machines
-5. update the operating systems to the latest corporate release if golden image is not yet
-6. configure the operating systems with the latest and greatest access policies
-7. deploy backup, security and observability packages
-8. configure additional storage for both (virtual) machines
-9. deploy DB service on one (virtual)machine 
-9. deploy CMS service on one (virtual)machine
-10. check connectivity and adjust firewall
-11. request SSL certificate for external exposure
-12. configure load balancer for external exposure
-13. check external exposure
-15. Dev team to access, verify and confirm all good and most likely requests some additional libs or packages to be deployed
-16. Dev team to load the contents 
-17. configure DB backup
-18. configure system backup
+1. get IP addresses (hoping there is an IPAM)
+1. configure DNS
+1. provision at least 2 (virtual) machines
+1. update the operating systems to the latest corporate release if golden image is not yet
+1. configure the operating systems with the latest and greatest access policies
+1. deploy backup, security and auditing packages
+1. deploy observability packages
+1. configure additional storage for both (virtual) machines
+1. deploy DB service on one (virtual)machine 
+1. deploy CMS service on one (virtual)machine
+1. check connectivity and adjust firewall
+1. request SSL certificate for external exposure
+1. configure load balancer for external exposure
+1. check external exposure
+1. Dev team to access, verify and confirm all good and most likely requests some additional libs or packages to be deployed
+1. Dev team to load the contents 
+1. configure CMS & DB backup
+1. configure system level backup
 
 By experience, the above would have a lead time between 1 week (impressive) up to months!  
 Let's keep these steps above in mind when going through the same deployment with k8s.
 
 ## the new republic
+Taking the above into consideration, let's try to build a table to address each elements from one world to another. 
+
+|tasks|k8s|
+|-----|---|
+|1,2,3,7,8,12,13*,14*|abstracted by k8s platform
+|4,5,6|container spec definition of StatefulSet & rollout strategies
+|     |container image management for life-cycle
+|9    |volumeMounts settings within the container & volumeClaimTemplates spec
+|10,11|container spec definition of StatefulSet
+|     |container image management for life-cycle
+|15,16,17|abstracted by Continuous Deployment
+|18   |Ops
+
+Notes: 
+- ```abstracted by k8s platform``` means the necessary components are deployed and available to developers using k8s API object constructs like annotations, labels, API objects, ... 
+- \* should be totally abstracted but some organizations wants control SSL and load balancer configuration mostly because of lack of trust and/or automation skills.
+
+# statful application deployment
+
 ## namespace - segmentation and multi-tenancy
-Also known as project, a [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) provides features like:
+k8s by definition is a platform to be shared with many teams to deploy many workloads. To avoid chaos, disaster and entropy, there is a need to give a ```space``` for each team projects to exist without impacting any others. This first segmenation and multi-tenancy attribute is called a ```namespace``` (also known as ```project``` for other k8s distributions) and provides features like:
 - multi tenancy
-- cluster resources definition via quota
 - grouping objects together  
+- cluster resources definition via quota
+- explicit cluster resource partitioning from other namespace
 
-k8s is using a set of default namespaces, names might be different from one k8s flavor to another, to provide a clear segmentation between software components.
+ Official documentation: [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
 
-A namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application. To create a namespace, the following configuration file can be applied:
+k8s has a bunch of built-in namespaces, numbers are varying by k8s distributions and added components, to provide a clear segmentation between k8s components and workloads.
+
+If not explicitly defined, any deployment will happen in the namespace called ```default```. This is obviously a bad practices and only appreciated when doing demo or introduction like in 101.  
+Here, a namespace called ```foodmag-app``` will be created to group all the related resources for the stateful application. To create a namespace, the following configuration file can be applied:
 
 ```foodmag-app-namespace.yaml```:
 ```yaml
@@ -65,9 +89,9 @@ metadata:
 ```
 The above YAML is a perfect small example to present the structure:  
 1. reference to an API version (it could also refer to a specific API set like ```apps/vi```)
-2. reference to an API object like here ```Namespace``` to create, read, update, delete (CRUD)
-3. reference to metadata which are usually to give/refer to a name to an object (and more)
-4. indentation, indentation, indentation!
+1. reference to an API object like here ```Namespace``` to create, read, update, delete (CRUD)
+1. reference to metadata which are usually to give/refer to a name to an object (and more)
+1. indentation, indentation, indentation!
 
 To apply this configuration file, run the following:
 ```
@@ -394,25 +418,27 @@ Forwarding from 172.22.135.113:8080 -> 80
 Open a browser with as URL ```172.22.135.113:8080``` which should show the following:  
 
 Welcome page to install the CMS
-![foodmag-app browser](images/foodmag-app_browser-01.png)
+<!-- ![foodmag-app browser](images/foodmag-app_browser-01.png) -->
 
 Select Demo to insert the foodmag data
-![foodmag-app browser](images/foodmag-app_browser-02.png)
+<!-- ![foodmag-app browser](images/foodmag-app_browser-02.png) -->
 
-Provide the database details (see env details from the statefulset): 
+Provide the database details (or see env details from the statefulset if modified): 
 - select PostgreSQL
-- database name
-- database username
-- database password
-- database service name
+- database name: foodmagappdb
+- database username: foodmagapp
+- database password: foodmagpassword
+- database service name: foodmag-app-db
 
-![foodmag-app browser](images/foodmag-app_browser-03.png)
+<!-- ![foodmag-app browser](images/foodmag-app_browser-03.png) -->
 
 Installation in progress (with more questions about name, email,...):
-![foodmag-app browser](images/foodmag-app_browser-04.png)
+<!-- ![foodmag-app browser](images/foodmag-app_browser-04.png) -->
 
 Tadadaaaaaa! Here our website!
-![foodmag-app browser](images/foodmag-app_browser-05.png)
+<!-- ![foodmag-app browser](images/foodmag-app_browser-05.png) -->
 
 ## Scale up, Scale down... Scale up, Scale down
+Scaling up/down is handy where there is a need 
+
 
