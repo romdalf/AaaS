@@ -1,8 +1,15 @@
 # anything-as-a-Service (AaaS)
 This repository content is used to illustrate the anything-as-a-service with the migration of a stateful/legacy application on kubernetes (k8s) with persistent storage using [StorageOS](https://storageos.com) as cloud native storage backend.  
 
-The content is divided in chapters providing a ramping up from basic to advanced hands-on. The only knowledge requirements at the start are basic linux skills and container understanding. 
+To ease the reading and practices, cloning this repository is advised as it will give the access to all the configuration files used in each chapters to avoid copy/pasting and direct inline modification from CLI or code editor. 
 
+To clone:
+```
+git clone https://github.com/rovandep/AaaS.git
+cd AaaS
+```
+
+The content is divided in chapters providing a ramping up from basic to advanced hands-on. The only knowledge requirements at the start are basic linux skills and container understanding. 
 
 | Chapter  | Title | Status |
 | --- | --- | --- | 
@@ -12,3 +19,5 @@ The content is divided in chapters providing a ramping up from basic to advanced
 | [401]() | multi-cluster capabilities | ![todo](https://img.shields.io/badge/status-0%25-red) |
 | [501]() | securing a stateful deployment | ![todo](https://img.shields.io/badge/status-0%25-red) |
 | [captsone]() | full migration scenario from legacy to k8s | ![todo](https://img.shields.io/badge/status-0%25-red) |
+
+Fork, PR, Issues are welcome! #sharingiscaring
