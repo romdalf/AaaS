@@ -205,51 +205,17 @@ pod/foodmag-app-0   2/2     Running   0          11m   10.244.0.29   dbaas-8rowa
 NAME                           READY   AGE   CONTAINERS                        IMAGES
 statefulset.apps/foodmag-app   1/1     13m   foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
 ```
-The StatefulSet created one Pod with 2 running containers; one for the ```foodmag-app-sql``` and one for ```foodmag-app-cms```, shown within the StatefuleSet output.
-```
-kubectl get pvc -n foodmag-app
-NAME                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
-foodmag-app-cms-pvc-foodmag-app-0   Bound    pvc-7dc38e7a-d28a-4c76-969d-4fe3958a0925   5Gi        RWO            storageos-rep-1   3h44m
-foodmag-app-sql-pvc-foodmag-app-0   Bound    pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            storageos-rep-1   3h44m
-```
-Two PVCs have been provisioned for each containers. Note that the above command outputs have an explicit usage of namespace ```foodmag-app```. Let's have a look without it:
-```
-kubectl get all
-NAME     READY   STATUS    RESTARTS   AGE
-pod/d1   1/1     Running   46         46h
-pod/d2   1/1     Running   46         46h
-
-NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-service/kubernetes   ClusterIP   10.245.0.1   <none>        443/TCP   3d19h 
-```
-Not referring to a namespace will present the objects existing/created within the namespace called ```default``` and same goes for the PVCs:
-```
-kubectl get pvc 
-NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
-pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast              3d2h
-pvc-2   Bound    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            storageos-rep-1   46h
-```
-
-Note that some objects can't be not attached to a specific namespace like the persistent volumes created from the PVCs even if explicitly requested with the ```foodmag-app``` namespace:
-```
-kubectl get pv -n foodmag-app
-NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                           STORAGECLASS      REASON   AGE
-pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            Delete           Bound    default/pvc-2                                   storageos-rep-1            47h
-pvc-7dc38e7a-d28a-4c76-969d-4fe3958a0925   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-cms-pvc-foodmag-app-0   storageos-rep-1            4h30m
-pvc-cc13bc1e-1d9b-4382-854a-3b9c12a5489b   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-sql-pvc-foodmag-app-0   storageos-rep-1            4h30m
-pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            Delete           Bound    default/pvc-1                                   fast                       3d3h
-```
-
-This illustrates the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further within the Security chapter (501).
 
 ## statefulset - what's in the box?
 At the current stage, the StatefulSet created a couple of objects:
-- StatefulSet (1)
-- Persistent Volume Claims (2)
-- Pods (2)
-- Persistent Volumes(2) 
+- 1 StatefulSet
+- 1 Pod with 2 containers
+- 2 Persistent Volume Claims
+- 2 Persistent Volumes 
 
-The following command will provide the complete inventory: 
+How does it translate into a CLI investigation? 
+
+```StatefulSet```:
 ```
 kubectl describe -n foodmag-app statefulset.apps/foodmag-app
 Name:               foodmag-app
@@ -304,6 +270,120 @@ Volume Claims:
   Access Modes:  [ReadWriteOnce]
 Events:          <none>
 ```
+
+```Pod```
+```
+kubectl describe -n foodmag-app pod/foodmag-app-0
+Name:         foodmag-app-0
+Namespace:    foodmag-app
+Priority:     0
+Node:         dbaas-8row6/10.110.0.9
+Start Time:   Sat, 15 May 2021 12:43:14 +0200
+Labels:       app=foodmag-app
+              controller-revision-hash=foodmag-app-74b7569896
+              env=prod
+              statefulset.kubernetes.io/pod-name=foodmag-app-0
+Annotations:  <none>
+Status:       Running
+IP:           10.244.0.246
+IPs:
+  IP:           10.244.0.246
+Controlled By:  StatefulSet/foodmag-app
+Containers:
+  foodmag-app-sql:
+    Container ID:   containerd://a10ecf729e42881e983b91e3614d0a6ae35a35f2db7d530e0f022cd76eb33e83
+    Image:          postgres:latest
+    Image ID:       docker.io/library/postgres@sha256:117c3ea384ce21421541515edfb11f2997b2c853d4fdd58a455b77664c1adc20
+    Port:           5432/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sat, 15 May 2021 12:43:19 +0200
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      POSTGRES_DB:        foodmagappdb
+      POSTGRES_USER:      foodmagapp
+      POSTGRES_PASSWORD:  foodmagpassword
+      PGDATA:             /var/lib/postgresql/data/pgdata
+    Mounts:
+      /var/lib/postgresql/data from foodmag-app-sql-pvc (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-d8d7d (ro)
+  foodmag-app-cms:
+    Container ID:   containerd://c4d4c9b2ba0ee82ddc729dedf8636ef3c25d483d04fcadf9c0335c1916dffd75
+    Image:          drupal:latest
+    Image ID:       docker.io/library/drupal@sha256:1cbebc5ce01d094d772338a12da507be6862a1318a7bb45c350d462f97d3500f
+    Port:           30080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sat, 15 May 2021 12:43:20 +0200
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-d8d7d (ro)
+      /var/www/html/modules from foodmag-app-cms-pvc (rw,path="modules")
+      /var/www/html/profiles from foodmag-app-cms-pvc (rw,path="profiles")
+      /var/www/html/themes from foodmag-app-cms-pvc (rw,path="themes")
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  foodmag-app-sql-pvc:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  foodmag-app-sql-pvc-foodmag-app-0
+    ReadOnly:   false
+  foodmag-app-cms-pvc:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  foodmag-app-cms-pvc-foodmag-app-0
+    ReadOnly:   false
+  default-token-d8d7d:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-d8d7d
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason                  Age        From                     Message
+  ----     ------                  ----       ----                     -------
+  Normal   Scheduled               <invalid>  storageos-scheduler      Successfully assigned foodmag-app/foodmag-app-0 to dbaas-8row6
+  Normal   SuccessfulAttachVolume  <invalid>  attachdetach-controller  AttachVolume.Attach succeeded for volume "pvc-101a37ba-ccd3-456d-9657-c3a4749bb94b"
+  Normal   SuccessfulAttachVolume  <invalid>  attachdetach-controller  AttachVolume.Attach succeeded for volume "pvc-d3b7aaa5-1ea1-4684-8679-0299427ad2f3"
+  Normal   Pulling                 <invalid>  kubelet                  Pulling image "postgres:latest"
+  Normal   Created                 <invalid>  kubelet                  Created container foodmag-app-sql
+  Normal   Pulled                  <invalid>  kubelet                  Successfully pulled image "postgres:latest" in 887.676858ms
+  Normal   Started                 <invalid>  kubelet                  Started container foodmag-app-sql
+  Normal   Pulling                 <invalid>  kubelet                  Pulling image "drupal:latest"
+  Normal   Pulled                  <invalid>  kubelet                  Successfully pulled image "drupal:latest" in 938.777937ms
+  Normal   Created                 <invalid>  kubelet                  Created container foodmag-app-cms
+  Normal   Started                 <invalid>  kubelet                  Started container foodmag-app-cms
+```
+
+```PVC```:
+```
+kubectl get pvc -n foodmag-app -o wide
+NAME                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE   VOLUMEMODE
+foodmag-app-cms-pvc-foodmag-app-0   Bound    pvc-d3b7aaa5-1ea1-4684-8679-0299427ad2f3   5Gi        RWO            storageos-rep-1   46m   Filesystem
+foodmag-app-sql-pvc-foodmag-app-0   Bound    pvc-101a37ba-ccd3-456d-9657-c3a4749bb94b   5Gi        RWO            storageos-rep-1   46m   Filesystem
+```
+
+```PV```
+```
+kubectl get pv -n foodmag-app -o wide
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                           STORAGECLASS      REASON   AGE     VOLUMEMODE
+pvc-101a37ba-ccd3-456d-9657-c3a4749bb94b   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-sql-pvc-foodmag-app-0   storageos-rep-1            49m     Filesystem
+pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            Delete           Bound    default/pvc-2                                   storageos-rep-1            6d20h   Filesystem
+pvc-d3b7aaa5-1ea1-4684-8679-0299427ad2f3   5Gi        RWO            Delete           Bound    foodmag-app/foodmag-app-cms-pvc-foodmag-app-0   storageos-rep-1            49m     Filesystem
+pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            Delete           Bound    default/pvc-1                                   fast                       8d      Filesystem
+```
+Note that, even if explicitly using ```foodmag-app``` namespace arguments, some objects can't be not attached to/filtered with a specific namespace like the persistent volumes created out of the PVCs. The above output shows all existing persistem volumes from 101 and 201 despite the ```-n foodmag-app```.  
+This illustrates the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further within the Security chapter (501).
+
+
 
 ## statefulset - where is my foodmag?
 Despite the fact that both containers have been deployed successfully with their persistent storage, and despite the fact both containers have ports being defined, there is are no exposure for the outside world to access the CMS front-end. 
