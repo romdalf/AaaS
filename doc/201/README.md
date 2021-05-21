@@ -393,9 +393,8 @@ Note that, even if explicitly using ```foodmag-app``` namespace arguments, some 
 This illustrates the concept of segmentation of resource opening doors to multi-tenancy. This will be investigated further within the Security chapter (501).
 
 
-
 ## statefulset - where is my foodmag?
-Despite the fact that both containers have been deployed successfully with their persistent storage, and despite the fact both containers have ports being defined, there is are no exposure for the outside world to access the CMS front-end. 
+Despite the fact that both containers have been deployed successfully with their persistent storage and having ports being defined, there is are no exposure for the outside world to access the CMS front-end. 
 
 To do so, a service object needs offer exposure from the outside world to the appropriate container, in this case the ```foodmag-app-cms```. This can be done via the following YAML code:
 
@@ -420,31 +419,11 @@ spec:
     env: prod
 ```
 
-The results will be the followings:
-
+To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-cms-service.yaml
 ``` 
-
-```
-kubectl get all -n foodmag-app -o wide
-```
-```
-NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
-pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
-
-NAME                              TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE   SELECTOR
-service/foodmag-app-cms-service   NodePort   10.245.253.117   <none>        80:30080/TCP   37s   app=foodmag-app,env=prod
-
-NAME                           READY   AGE   CONTAINERS                        IMAGES
-statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
-```
-
-The above shows the new service being available to expose the CMS front-end TCP port 80 on a node redirecting traffic to the container TCP port 30080.
-
-What about the ```foodmag-app-sql```? Good question! This is indeed the same issue but the main difference is about to radius of exposure. While the CMS needs to be exposed to the outside world, the database has to be exposed only to the CMS.  
-
-As a matter of fact, if the database service is not created, skipping the next step and going forward with connecting to the CMS will results in failure to configure and deploy the demo data in. This can be done via the following YAML code: 
+What about the ```foodmag-app-sql```? Good question! This is indeed the same issue but with a difference to the exposure radius. While the CMS needs to be exposed to the outside world, the database has to be exposed only to the CMS. This can be done via the following YAML code: 
 
 ```foodmag-app-sql-service.yaml```:
 ```yaml
@@ -470,20 +449,19 @@ The results will be the followings:
 ```
 kubectl apply -f doc/201/foodmag-app/v1/foodmag-app-sql-service.yaml 
 ```
+The results will be the followings:
 ```
-kubectl get all -n foodmag-app -o wide
+kubectl get service -n foodmag-app -o wide
 ```
 ```
-NAME                READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
-pod/foodmag-app-0   2/2     Running   0          8h    10.244.0.29   dbaas-8rowa   <none>           <none>
-
-NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE   SELECTOR
-service/foodmag-app-cms-service   NodePort    10.245.253.117   <none>        80:30080/TCP   26m   app=foodmag-app,env=prod
-service/foodmag-app-sql-service   ClusterIP   10.245.211.246   <none>        5432/TCP       7s    app=foodmag-app,env=prod
-
-NAME                           READY   AGE   CONTAINERS                        IMAGES
-statefulset.apps/foodmag-app   1/1     8h    foodmag-app-sql,foodmag-app-cms   postgres:latest,drupal:latest
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+foodmag-app-cms-service   NodePort    10.245.147.20   <none>        80:30080/TCP   86m   app=foodmag-app,env=prod
+foodmag-app-sql-service   ClusterIP   10.245.7.31     <none>        5432/TCP       86m   app=foodmag-app,env=prod
 ```
+The above shows:
+- the cms service being exposed on TCP port 80 on a node redirecting traffic to the container TCP port 30080.
+- the sql service being exposed on TCP port 5432 using a cluster IP.
+- the selector with available labels to ensure proper connection to the proper StatefulSet (see previous section ```describe```).
 
 Notes:
 - As discussed above, due to the exposure radius, the CMS use a [k8s service](https://kubernetes.io/docs/concepts/services-networking/service/) type ```NodePort``` to expose the service to the outside world while the database is using a ```ClusterIP``` to expose the service only within the cluster bubble.
