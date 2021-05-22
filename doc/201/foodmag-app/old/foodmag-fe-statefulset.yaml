@@ -21,8 +21,6 @@ kind: StatefulSet
 metadata:
   name: foodmag-app-fe
   namespace: foodmag-app
-  annotations:
-    backup.velero.io/backup-volumes: foodmag-app-fe-pv
 spec:
   selector:
     matchLabels:
@@ -32,6 +30,8 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: foodmag-app-fe-pv            
       labels:
         app: foodmag-app-fe
         env: prod
@@ -42,7 +42,7 @@ spec:
           command: ['/bin/bash','-c']
           args: ['/bin/cp -R /var/www/html/sites/ /data/; chown -R www-data:www-data /data/']
           volumeMounts:
-            - name: foodmag-app-fe-pv
+            - name: foodmag-app-fe-pvc
               mountPath: /data
       containers:
         - name: foodmag-app-fe
@@ -51,21 +51,21 @@ spec:
             - containerPort: 30080
               name: foodmag-app-fe
           volumeMounts:
-            - name: foodmag-app-fe-pv
+            - name: foodmag-app-fe-pvc
               mountPath: /var/www/html/modules
               subPath: modules
-            - name: foodmag-app-fe-pv
+            - name: foodmag-app-fe-pvc
               mountPath: /var/www/html/profiles
               subPath: profiles
-            - name: foodmag-app-fe-pv
+            - name: foodmag-app-fe-pvc
               mountPath: /var/www/html/themes
               subPath: themes
-            - name: foodmag-app-fe-pv
+            - name: foodmag-app-fe-pvc
               mountPath: /var/www/html/sites
               subPath: sites
   volumeClaimTemplates:
     - metadata:
-        name: foodmag-app-fe-pv
+        name: foodmag-app-fe-pvc
         labels:
           app: foodmag-app-fe
           env: prod

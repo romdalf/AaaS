@@ -20,8 +20,6 @@ kind: StatefulSet
 metadata:
   name: foodmag-app-db
   namespace: foodmag-app
-  annotations:
-    backup.velero.io/backup-volumes: foodmag-app-db-pvc
 spec:
   selector:
     matchLabels:
@@ -31,6 +29,8 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: foodmag-app-db-pvc
       labels:
         app: foodmag-app-db
         env: prod
