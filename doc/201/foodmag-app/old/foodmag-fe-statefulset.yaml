@@ -31,7 +31,7 @@ spec:
   template:
     metadata:
       annotations:
-        backup.velero.io/backup-volumes: foodmag-app-fe-pv            
+        backup.velero.io/backup-volumes: foodmag-app-fe-pvc            
       labels:
         app: foodmag-app-fe
         env: prod
