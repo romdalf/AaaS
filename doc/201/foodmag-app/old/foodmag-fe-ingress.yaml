@@ -12,10 +12,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - foodmag.doks.myshiny.space
+    - foodmag-app.doks.myshiny.space
     secretName: foodmag-app-tls
   rules:
-  - host: "foodmag.doks.myshiny.space"
+  - host: "foodmag-app.doks.myshiny.space"
     http:
       paths:
       - pathType: Prefix
