@@ -1,4 +1,4 @@
-# 201 - anatomy of a stateful deployment
+# anatomy of a stateful deployment
 
 # foodmag - a blog about food!
 
