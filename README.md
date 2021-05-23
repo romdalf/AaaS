@@ -5,5 +5,5 @@ The content is divided in chapters providing a ramping up from basic to advanced
 
 Best approach to consume the content is to either:
 - access: https://rovandep.github.io/AaaS/#/ 
-- access: via github links
+- access: via github repo interface
 - clone the repository 
