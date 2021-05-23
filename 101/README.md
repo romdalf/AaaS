@@ -1,4 +1,4 @@
-# 101 - basics of k8s and persistent storage
+# basics of k8s and persistent storage
 
 ## preparing the cluster
 A good 50% of this repo could be done without having a real k8s cluster and using instead minikube or any similar one node k8s project. However, to make it through the full guide, it would be recommended, especially when looking into persistent storage.  
@@ -24,6 +24,8 @@ export KUBECONFIG=~/.kube/digitalocean
 Once exported, ```kubectl``` can be used to verify connectivity:
 ```
 kubectl get nodes
+```
+```
 NAME          STATUS   ROLES    AGE   VERSION
 dbaas-8row6   Ready    <none>   54m   v1.20.2
 dbaas-8rowa   Ready    <none>   54m   v1.20.2
@@ -46,7 +48,8 @@ Wait! Be brave, don't just copy/paste the above... curl first, review and then e
 The output would like like:
 ```
 curl -sL https://storageos.run |bash
-
+```
+```
 Welcome to the StorageOS quick installation script.
 I will install StorageOS version v2.4.0-rc.1 into
 namespace kube-system now. If I encounter any errors
@@ -106,6 +109,8 @@ https://docs.storageos.com/docs/prerequisites/etcd/
 Let's verify the status of the StorageOS cluster within our k8s cluster:
 ```
 kubectl exec -n kube-system -it cli -- storageos get cluster
+```
+```
 ID:           ed08d40e-5035-4270-81bd-2af74d53b5f8
 Created at:   2021-05-07T09:32:40Z (2 minutes ago)
 Updated at:   2021-05-07T09:32:40Z (2 minutes ago)
@@ -190,9 +195,14 @@ To actually deploy the first app configuration, the following command can be exe
 
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpvc.yaml
+```
+```
 persistentvolumeclaim/pvc-1 created
-
+```
+```
 kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
+```
+```
 pod/d1 created
 ```
 Wow! no fireworks or music? nope... it just did it! 

@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: foodmag-app-ingress
+  namespace: foodmag-app
+  labels:
+    app: foodmag-app-fe
+    env: prod
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: doks-cert
+spec:
+  tls:
+  - hosts:
+    - foodmag-app.doks.myshiny.space
+    secretName: foodmag-app-tls
+  rules:
+  - host: "foodmag-app.doks.myshiny.space"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: foodmag-app-fe-service
+            port:
+              number: 80
