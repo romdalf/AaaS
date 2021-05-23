@@ -1,12 +1,5 @@
 # basics of k8s and persistent storage
 
-## preparing the cluster
-A good 50% of this repo could be done without having a real k8s cluster and using instead minikube or any similar one node k8s project. However, to make it through the full guide, it would be recommended, especially when looking into persistent storage.  
-
-To deploy a k8s cluster, 3 VMs would be required, each having 2vCPU/2GB RAM/20GB disk. There are a couple of ways to deploy a 3 node k8s cluster without to much of hazzle like [k3s](https://k3s.io/) providing the user with a very lightweight k8s option consuming very little resources but yet offering the basic magic power of k8s.
-
-For the purposes of this guide, a k8s cluster deployed within DigitalOcean is used. The overall guide should be agnostic of any k8s cluster provider (aks, eks, ...). 
-
 ## connecting to k8s
 The first component to connect to k8s platform is [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/), the link provides the installation methodology based on the operating system.  
 The second component to connect is a config file also referred as kubeconfig which presents itself as yaml file. If on linux machine, the file is usually found in: 
