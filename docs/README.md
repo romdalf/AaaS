@@ -1,11 +1,11 @@
 # anything-as-a-Service (AaaS)
 
-## Learner Outcomes
+## learner Outcomes
 * Get familiar with kubernetes and persistent storage
 * Get hands-on to deploy and migrate stateful workload
 * Get hands-on on Continuous deployment
 
-## Pre-requisites
+## prerequisites
 A good 50% of the content could be followed without having a real k8s cluster and using instead one of the multiple one-node kubernetes project like minikube or code-reayd-container.  
 However, to appreciate the content, a 3-nodes kubernetes (k8s) cluster would be required especially when looking into persistent storage.  
 
