@@ -29,8 +29,8 @@ dbaas-8rowe   Ready    <none>   54m   v1.20.2
 ```
 This output shows a 3 node cluster running a kubernetes version 1.20.2 freshly deployed ready to schedule workload.
 
-## deploying a persistent storage solution
-K8s is designed to support stateless workload natively. To support stateful workload, a persistent storage solution has to be implemented in order to provide a volume to be consummed by the application. The volume will survice the application rescheduling, scaling up/down, or deletion.  
+## persistent storage solution
+k8s is designed to support stateless workload natively. To support stateful workload, a persistent storage solution has to be implemented in order to provide a volume to be consummed by the application. The volume will survice the application rescheduling, scaling up/down, or deletion.  
 [StorageOS](https://storageos.com) is cloud native, software-defined storage for running containerized applications in production, running in the cloud, on-prem and in hybrid/multi-cloud environments. 
 
 [StorageOS](https://storageos.com) has a free forever developer tier that can be used for such environment or for a development platform. A [self evaluation guide](https://docs.storageos.com/docs/self-eval/) provides the user with a script to do a rapid deployment which will consume local disk space on nodes while providing a fully distributed persistent storage for stateful applications. Remember, this is not suited for a production deployment but performed for testing. 
@@ -45,62 +45,61 @@ The output would like like:
 ```
 curl -sL https://storageos.run |bash
 ```
-```
-Welcome to the StorageOS quick installation script.
-I will install StorageOS version v2.4.0-rc.1 into
-namespace kube-system now. If I encounter any errors
-I will stop immediately.
 
-Creating etcd namespace storageos-etcd
-namespace/storageos-etcd created
-Creating etcd ClusterRole and ClusterRoleBinding
-clusterrolebinding.rbac.authorization.k8s.io/etcd-operator created
-clusterrole.rbac.authorization.k8s.io/etcd-operator created
-Creating etcd operator Deployment
-deployment.apps/etcd-operator created
-Creating etcd cluster in namespace storageos-etcd
-etcdcluster.etcd.database.coreos.com/storageos-etcd created
-Installing StorageOS Operator version v2.4.0-rc.1
-Warning: apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition
-customresourcedefinition.apiextensions.k8s.io/storageosclusters.storageos.com created
-customresourcedefinition.apiextensions.k8s.io/storageosupgrades.storageos.com created
-customresourcedefinition.apiextensions.k8s.io/jobs.storageos.com created
-customresourcedefinition.apiextensions.k8s.io/nfsservers.storageos.com created
-namespace/storageos-operator created
-clusterrole.rbac.authorization.k8s.io/storageos-operator created
-serviceaccount/storageoscluster-operator-sa created
-Warning: rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding
-clusterrolebinding.rbac.authorization.k8s.io/storageoscluster-operator-rolebinding created
-deployment.apps/storageos-cluster-operator created
-Operator installed, waiting for pod to become ready
-StorageOS Operator installed successfully
-Creating Secret definining the API Username and Password
-secret/storageos-api created
-Installing StorageOS Cluster version v2.4.0-rc.1
-storageoscluster.storageos.com/self-evaluation created
-Waiting for StorageOS pods to become ready
-Waiting for StorageOS pods to become ready
-Waiting for StorageOS pods to become ready
-Waiting for StorageOS pods to become ready
-Waiting for StorageOS pods to become ready
-StorageOS Cluster installed successfully
-Deploying the StorageOS CLI as a pod in the kube-system namespace
-pod/cli created
-Waiting for the cli pod to become ready
-StorageOS CLI pod is running
-Your StorageOS Cluster now is up and running!
-
-Now would be a good time to deploy your first volume - see
+>Welcome to the StorageOS quick installation script.  
+>I will install StorageOS version v2.4.0-rc.1 into  
+>namespace kube-system now. If I encounter any errors  
+>I will stop immediately.  
+>  
+>Creating etcd namespace storageos-etcd  
+>namespace/storageos-etcd created  
+>Creating etcd ClusterRole and ClusterRoleBinding  
+>clusterrolebinding.rbac.authorization.k8s.io/etcd-operator created  
+>clusterrole.rbac.authorization.k8s.io/etcd-operator created  
+>Creating etcd operator Deployment  
+>deployment.apps/etcd-operator created  
+>Creating etcd cluster in namespace storageos-etcd  
+>etcdcluster.etcd.database.coreos.com/storageos-etcd created  
+>Installing StorageOS Operator version v2.4.0-rc.1  
+>Warning: apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition  
+>customresourcedefinition.apiextensions.k8s.io/storageosclusters.storageos.com created  
+>customresourcedefinition.apiextensions.k8s.io/storageosupgrades.storageos.com created  
+>customresourcedefinition.apiextensions.k8s.io/jobs.storageos.com created  
+>customresourcedefinition.apiextensions.k8s.io/nfsservers.storageos.com created  
+>namespace/storageos-operator created  
+>clusterrole.rbac.authorization.k8s.io/storageos-operator created  
+>serviceaccount/storageoscluster-operator-sa created  
+>Warning: rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding  
+>clusterrolebinding.rbac.authorization.k8s.io/storageoscluster-operator-rolebinding created  
+>deployment.apps/storageos-cluster-operator created  
+>Operator installed, waiting for pod to become ready  
+>StorageOS Operator installed successfully  
+>Creating Secret definining the API Username and Password  
+>secret/storageos-api created  
+>Installing StorageOS Cluster version v2.4.0-rc.1  
+>storageoscluster.storageos.com/self-evaluation created  
+>Waiting for StorageOS pods to become ready  
+>Waiting for StorageOS pods to become ready  
+>Waiting for StorageOS pods to become ready  
+>Waiting for StorageOS pods to become ready  
+>Waiting for StorageOS pods to become ready  
+>StorageOS Cluster installed successfully  
+>Deploying the StorageOS CLI as a pod in the kube-system namespace  
+>pod/cli created  
+>Waiting for the cli pod to become ready  
+>StorageOS CLI pod is running  
+>Your StorageOS Cluster now is up and running!  
+>  
+>Now would be a good time to deploy your first volume - see  
 https://docs.storageos.com/docs/self-eval/#a-namestorageosvolumeaprovision-a-storageos-volume
-for an example of how to mount a StorageOS volume in a pod
-
-Don't forget to license your cluster - see https://docs.storageos.com/docs/operations/licensing/
-
-This cluster has been set up with an etcd based on ephemeral
-storage. It is suitable for evaluation purposes only - for
-production usage please see our etcd installation nodes at
-https://docs.storageos.com/docs/prerequisites/etcd/
-```
+for an example of how to mount a StorageOS volume in a pod  
+>  
+>Don't forget to license your cluster - see https://docs.storageos.com/docs/operations/licensing/  
+>  
+>This cluster has been set up with an etcd based on ephemeral  
+>storage. It is suitable for evaluation purposes only - for  
+>production usage please see our etcd installation nodes at  
+>https://docs.storageos.com/docs/prerequisites/etcd/  
 
 Let's verify the status of the StorageOS cluster within our k8s cluster:
 ```
@@ -115,7 +114,7 @@ Nodes:        3
   Unhealthy:  0
 ```
 
-## my first app - show me the YAML
+## first config pod
 Before starting to run, let's have a little walk. The following example is from the actual [StorageOS](https://storageos.com) self evaluation guide providing two YAML definition for creating a Persistent Volume Claim (PVC) and an application (Pod) that will consume the persistent volume (PV). 
 
 The following diagram shows the expected results:  
@@ -186,21 +185,17 @@ Notes:
 - note the comment structure of the descriptive configuration file. This is a well-documented standard. 
 - two files are created but both YAML code could be append within the same file based on the above output. 
 
-## my first app - show me the running YAML
+## first running app
 To actually deploy the first app configuration, the following command can be executed:
 
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpvc.yaml
 ```
-```
-persistentvolumeclaim/pvc-1 created
-```
+>persistentvolumeclaim/pvc-1 created
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
 ```
-```
-pod/d1 created
-```
+>pod/d1 created
 Wow! no fireworks or music? nope... it just did it! 
 
 The results will be two objects that are linked together:
@@ -222,7 +217,7 @@ default    pvc-f4af80a7-1224-4641-abae-8403e3c9827b  5.0 GiB  dbaas-8rowa (onlin
 ```
 Compared to ```kubectl get pvc```, there are two interesting additional details; location in terms of node and replicas.
 
-## illustrate persistent storage
+## persistent storage objects
 The goal of this first app is to provide an undestanding of the different objects like PVC, PV, or Pod and then illustrate the ephemeral nature of a Pod. 
 
 Let's connect to the running pod and save some important message on our volume.
