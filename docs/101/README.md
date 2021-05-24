@@ -21,13 +21,14 @@ Once exported, ```kubectl``` can be used to verify connectivity:
 ```
 kubectl get nodes
 ```
+The results will be followings:
 ```
 NAME          STATUS   ROLES    AGE   VERSION
 dbaas-8row6   Ready    <none>   54m   v1.20.2
 dbaas-8rowa   Ready    <none>   54m   v1.20.2
 dbaas-8rowe   Ready    <none>   54m   v1.20.2
 ```
-This output shows a 3 node cluster running a kubernetes version 1.20.2 freshly deployed ready to schedule workload.
+This output shows a 3-node cluster running a kubernetes version 1.20.2 freshly deployed ready to schedule workload.
 
 ## persistent storage solution
 k8s is designed to support stateless workload natively. To support stateful workload, a persistent storage solution has to be implemented in order to provide a volume to be consummed by the application. The volume will survice the application rescheduling, scaling up/down, or deletion.  
@@ -41,70 +42,68 @@ curl -sL https://storageos.run | bash
 ```
 Wait! Be brave, don't just copy/paste the above... curl first, review and then execute.
 
-The output would like like:
+The results will be followings:
 ```
-curl -sL https://storageos.run |bash
-```
-
->Welcome to the StorageOS quick installation script.  
->I will install StorageOS version v2.4.0-rc.1 into  
->namespace kube-system now. If I encounter any errors  
->I will stop immediately.  
->  
->Creating etcd namespace storageos-etcd  
->namespace/storageos-etcd created  
->Creating etcd ClusterRole and ClusterRoleBinding  
->clusterrolebinding.rbac.authorization.k8s.io/etcd-operator created  
->clusterrole.rbac.authorization.k8s.io/etcd-operator created  
->Creating etcd operator Deployment  
->deployment.apps/etcd-operator created  
->Creating etcd cluster in namespace storageos-etcd  
->etcdcluster.etcd.database.coreos.com/storageos-etcd created  
->Installing StorageOS Operator version v2.4.0-rc.1  
->Warning: apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition  
->customresourcedefinition.apiextensions.k8s.io/storageosclusters.storageos.com created  
->customresourcedefinition.apiextensions.k8s.io/storageosupgrades.storageos.com created  
->customresourcedefinition.apiextensions.k8s.io/jobs.storageos.com created  
->customresourcedefinition.apiextensions.k8s.io/nfsservers.storageos.com created  
->namespace/storageos-operator created  
->clusterrole.rbac.authorization.k8s.io/storageos-operator created  
->serviceaccount/storageoscluster-operator-sa created  
->Warning: rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding  
->clusterrolebinding.rbac.authorization.k8s.io/storageoscluster-operator-rolebinding created  
->deployment.apps/storageos-cluster-operator created  
->Operator installed, waiting for pod to become ready  
->StorageOS Operator installed successfully  
->Creating Secret definining the API Username and Password  
->secret/storageos-api created  
->Installing StorageOS Cluster version v2.4.0-rc.1  
->storageoscluster.storageos.com/self-evaluation created  
->Waiting for StorageOS pods to become ready  
->Waiting for StorageOS pods to become ready  
->Waiting for StorageOS pods to become ready  
->Waiting for StorageOS pods to become ready  
->Waiting for StorageOS pods to become ready  
->StorageOS Cluster installed successfully  
->Deploying the StorageOS CLI as a pod in the kube-system namespace  
->pod/cli created  
->Waiting for the cli pod to become ready  
->StorageOS CLI pod is running  
->Your StorageOS Cluster now is up and running!  
->  
->Now would be a good time to deploy your first volume - see  
+Welcome to the StorageOS quick installation script.  
+I will install StorageOS version v2.4.0-rc.1 into  
+namespace kube-system now. If I encounter any errors  
+I will stop immediately.  
+  
+Creating etcd namespace storageos-etcd  
+namespace/storageos-etcd created  
+Creating etcd ClusterRole and ClusterRoleBinding  
+clusterrolebinding.rbac.authorization.k8s.io/etcd-operator created  
+clusterrole.rbac.authorization.k8s.io/etcd-operator created  
+Creating etcd operator Deployment  
+deployment.apps/etcd-operator created  
+Creating etcd cluster in namespace storageos-etcd  
+etcdcluster.etcd.database.coreos.com/storageos-etcd created  
+Installing StorageOS Operator version v2.4.0-rc.1  
+Warning: apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition  
+customresourcedefinition.apiextensions.k8s.io/storageosclusters.storageos.com created  
+customresourcedefinition.apiextensions.k8s.io/storageosupgrades.storageos.com created  
+customresourcedefinition.apiextensions.k8s.io/jobs.storageos.com created  
+customresourcedefinition.apiextensions.k8s.io/nfsservers.storageos.com created  
+namespace/storageos-operator created  
+clusterrole.rbac.authorization.k8s.io/storageos-operator created  
+serviceaccount/storageoscluster-operator-sa created  
+Warning: rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding  
+clusterrolebinding.rbac.authorization.k8s.io/storageoscluster-operator-rolebinding created  
+deployment.apps/storageos-cluster-operator created  
+Operator installed, waiting for pod to become ready  
+StorageOS Operator installed successfully  
+Creating Secret definining the API Username and Password  
+secret/storageos-api created  
+Installing StorageOS Cluster version v2.4.0-rc.1  
+storageoscluster.storageos.com/self-evaluation created  
+Waiting for StorageOS pods to become ready  
+Waiting for StorageOS pods to become ready  
+Waiting for StorageOS pods to become ready  
+Waiting for StorageOS pods to become ready  
+Waiting for StorageOS pods to become ready  
+StorageOS Cluster installed successfully  
+Deploying the StorageOS CLI as a pod in the kube-system namespace  
+pod/cli created  
+Waiting for the cli pod to become ready  
+StorageOS CLI pod is running  
+Your StorageOS Cluster now is up and running!  
+  
+Now would be a good time to deploy your first volume - see  
 https://docs.storageos.com/docs/self-eval/#a-namestorageosvolumeaprovision-a-storageos-volume
 for an example of how to mount a StorageOS volume in a pod  
->  
->Don't forget to license your cluster - see https://docs.storageos.com/docs/operations/licensing/  
->  
->This cluster has been set up with an etcd based on ephemeral  
->storage. It is suitable for evaluation purposes only - for  
->production usage please see our etcd installation nodes at  
->https://docs.storageos.com/docs/prerequisites/etcd/  
-
+  
+Don't forget to license your cluster - see https://docs.storageos.com/docs/operations/licensing/  
+  
+This cluster has been set up with an etcd based on ephemeral  
+storage. It is suitable for evaluation purposes only - for  
+production usage please see our etcd installation nodes at  
+https://docs.storageos.com/docs/prerequisites/etcd/  
+```
 Let's verify the status of the StorageOS cluster within our k8s cluster:
 ```
 kubectl exec -n kube-system -it cli -- storageos get cluster
 ```
+The results will be followings:
 ```
 ID:           ed08d40e-5035-4270-81bd-2af74d53b5f8
 Created at:   2021-05-07T09:32:40Z (2 minutes ago)
@@ -186,25 +185,39 @@ Notes:
 - two files are created but both YAML code could be append within the same file based on the above output. 
 
 ## first running app
-To actually deploy the first app configuration, the following command can be executed:
+To apply this configuration file, run the following:
 
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpvc.yaml
 ```
->persistentvolumeclaim/pvc-1 created
+The results will be followings:
+```
+persistentvolumeclaim/pvc-1 created
+```
+To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
 ```
->pod/d1 created
+The results will be followings:
+```
+pod/d1 created
+```
 Wow! no fireworks or music? nope... it just did it! 
 
 The results will be two objects that are linked together:
 ```
 kubectl get pvc
+```
+The results will be followings:
+```
 NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast           86s
-
+```
+```
 kubectl get pod
+```
+The results will be followings:
+```
 NAME   READY   STATUS    RESTARTS   AGE
 d1     1/1     Running   0          95s
 ```
@@ -212,6 +225,10 @@ d1     1/1     Running   0          95s
 Since we are leverage [StorageOS](https://storageos.com), let's have a look at the volume from its view: 
 ```
 kubectl exec -n kube-system -it cli -- storageos get volume 
+```
+The results will be followings:
+
+```
 NAMESPACE  NAME                                      SIZE     LOCATION              ATTACHED ON  REPLICAS  AGE      
 default    pvc-f4af80a7-1224-4641-abae-8403e3c9827b  5.0 GiB  dbaas-8rowa (online)               0/0       1 day ago
 ```
@@ -255,12 +272,23 @@ The important message has been saved at two different places:
 Let's destroy the Pod and observe the container image ephemeral nature:
 ```
 kubectl delete pod d1
+```
+The results will be followings:
+```
 pod "d1" deleted
-
+``` 
+```
 kubectl get pod
+```
+The results will be followings:
+```
 No resources found in default namespace.
-
+```
+```
 kubectl get pvc
+```
+The results will be followings:
+```
 NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast           13m
 ```
@@ -268,13 +296,24 @@ The above output confirms that the Pod is delete but the PVC and volume still ex
 
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
+```
+The results will be followings:
+```
 pod/d1 created
-
+```
+```
 kubectl get pod
+```
+The results will be followings:
+```
 NAME   READY   STATUS              RESTARTS   AGE
 d1     0/1     ContainerCreating   0          4s
-
+```
+```
 kubectl get pod
+```
+The results will be followings:
+```
 NAME   READY   STATUS    RESTARTS   AGE
 d1     1/1     Running   0          12s
 ```
@@ -329,6 +368,9 @@ The reference is made towards the ```storageClass``` called "fast". Let's invest
 
 ```
 kubectl get storageClass 
+```
+The results will be followings:
+```
 NAME                         PROVISIONER                 RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 do-block-storage (default)   dobs.csi.digitalocean.com   Delete          Immediate           true                   43h
 fast                         csi.storageos.com           Delete          Immediate           true                   28h
@@ -336,6 +378,9 @@ fast                         csi.storageos.com           Delete          Immedia
 The output shows two ```storageClass``` including "fast" one which is using our [StorageOS](https://storageos.com) cluster. Let's dig for further details with ```kubectl describe```:
 ```
 kubectl describe storageClass fast
+```
+The results will be followings:
+```
 Name:                  fast
 IsDefaultClass:        No
 Annotations:           <none>
@@ -379,18 +424,29 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-namespace: kube-system
   ``` 
 
-Time to apply:
+To apply this configuration file, run the following:
 ```
-kubectl apply -f doc/101/storageClass/replica_storageos_storageClass.yaml 
+kubectl apply -f doc/101/storageClass/replica_storageos_storageClass.yaml
+```
+The results will be followings:
+``` 
 storageclass.storage.k8s.io/storageos-rep-1 created
-
+```
+```
 kubectl get storageClass 
+```
+The results will be followings:
+```
 NAME                         PROVISIONER                 RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 do-block-storage (default)   dobs.csi.digitalocean.com   Delete          Immediate           true                   43h
 fast                         csi.storageos.com           Delete          Immediate           true                   28h
 storageos-rep-1              csi.storageos.com           Delete          Immediate           true                   6s
-
+```
+``` 
 kubectl describe storageClass storageos-rep-1
+```
+The results will be followings:
+```
 Name:            storageos-rep-1
 IsDefaultClass:  No
 Annotations:     kubectl.kubernetes.io/last-applied-configuration={"allowVolumeExpansion":true,"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{},"name":"storageos-rep-1"},"parameters":{"csi.storage.k8s.io/controller-expand-secret-name":"csi-controller-expand-secret","csi.storage.k8s.io/controller-expand-secret-namespace":"kube-system","csi.storage.k8s.io/controller-publish-secret-name":"csi-controller-publish-secret","csi.storage.k8s.io/controller-publish-secret-namespace":"kube-system","csi.storage.k8s.io/node-publish-secret-name":"csi-node-publish-secret","csi.storage.k8s.io/node-publish-secret-namespace":"kube-system","csi.storage.k8s.io/provisioner-secret-name":"csi-provisioner-secret","csi.storage.k8s.io/provisioner-secret-namespace":"kube-system","fsType":"ext4","pool":"default","storageos.com/replicas":"1"},"provisioner":"csi.storageos.com"}
@@ -442,25 +498,44 @@ spec:
       persistentVolumeClaim:
         claimName: pvc-2
 ```
-Let's apply them:
+To apply this configuration file, run the following:
 ```
 kubectl apply -f doc/101/storageClass/pvc-with-replica.yaml 
+```
+The results will be followings:
+```
 persistentvolumeclaim/pvc-2 created
-
+```
+```
 kubectl apply -f doc/101/storageClass/pod-with-pvc-replica.yaml 
+```
+The results will be followings:
+```
 pod/d2 created
-
+```
+```
 kubectl get pod
+```
+The results will be followings:
+```
 NAME   READY   STATUS    RESTARTS   AGE
 d1     1/1     Running   0          56s
 d2     1/1     Running   0          106s
-
+```
+```
 kubectl get pvc
+```
+The results will be followings:
+```
 NAME    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 pvc-1   Bound    pvc-f4af80a7-1224-4641-abae-8403e3c9827b   5Gi        RWO            fast              28h
 pvc-2   Bound    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c   5Gi        RWO            storageos-rep-1   105s
-
+```
+```
 kubectl exec -n kube-system -it cli -- storageos get volume 
+```
+The results will be followings:
+```
 NAMESPACE  NAME                                      SIZE     LOCATION              ATTACHED ON  REPLICAS  AGE          
 default    pvc-3e303b09-dc6f-4cf7-b46a-d368463f629c  5.0 GiB  dbaas-8row6 (online)  dbaas-8row6  1/1       3 minutes ago
 default    pvc-f4af80a7-1224-4641-abae-8403e3c9827b  5.0 GiB  dbaas-8rowa (online)  dbaas-8rowa  0/0       1 day ago    
