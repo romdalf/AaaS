@@ -4,6 +4,7 @@
 * Get familiar with kubernetes and persistent storage
 * Get hands-on to deploy and migrate stateful workload
 * Get hands-on on Continuous Deployment
+* Embrace DevOps practices
 
 ## prerequisites
 The content could be followed without having a real k8s cluster using instead an 1-node kubernetes cluster project like minikube or code-reayd-container.  
