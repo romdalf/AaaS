@@ -184,7 +184,7 @@ Notes:
 - note the comment structure of the descriptive configuration file. This is a well-documented standard. 
 - two files are created but both YAML code could be append within the same file based on the above output. 
 
-## first running app
+## first running pod
 To apply this configuration file, run the following:
 
 ```
