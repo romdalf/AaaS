@@ -1,16 +1,19 @@
 # basics of k8s and persistent storage
 
 ## connecting to k8s
-The first component to connect to k8s platform is [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/), the link provides the installation methodology based on the operating system.  
-The second component to connect is a config file also referred as kubeconfig which presents itself as yaml file. If on linux machine, the file is usually found in: 
+Per the prerequisites, a kubernetes (k8s) cluster is deployed and available to tinker with. To connect to k8s cluster, two components are required:
+* the CLI tool [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/). The link provides the installation methodology based on the operating system.
+* a config file referred to ```kubeconfig``` which presents itself as a yaml file. If the cluster is deployed via a cloud platform provider, the ```kubeconfig``` file will be available for download. 
+
+If using an unix-like machine, the file is usually found in: 
 ``` 
 ls -al ~/.kube/
 ```
-The file can save in that path under the name config or any other that can be exported as an environment variable as such:
+The file can be saved within the above path using the name ```config``` or any other name. Then, the file has to be exported as an environment variable like:
 ```
-export KUBECONFIG=~/.kube/file_name 
+export KUBECONFIG=~/.kube/config 
 ```
-like so if the file was called ```digitalocean```: 
+or using a different file name like ```digitalocean```: 
 ```
 export KUBECONFIG=~/.kube/digitalocean
 ```
