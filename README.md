@@ -4,6 +4,6 @@ This repository content is used to illustrate the anything-as-a-service with the
 The content is divided in chapters providing a ramping up from basic to advanced hands-on. The only knowledge requirements at the start are basic linux skills and container understanding. 
 
 Best approach to consume the content is to either:
-- access: https://rovandep.github.io/AaaS/#/ 
+- access: https://rovandep.github.io/AaaS/ 
 - access: via github repo interface
 - clone the repository 
