@@ -192,15 +192,11 @@ To actually deploy the first app configuration, the following command can be exe
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpvc.yaml
 ```
-```
-persistentvolumeclaim/pvc-1 created
-```
+>persistentvolumeclaim/pvc-1 created
 ```
 kubectl apply -f doc/101/myfirstapp/myfirstpod.yaml
 ```
-```
-pod/d1 created
-```
+>pod/d1 created
 Wow! no fireworks or music? nope... it just did it! 
 
 The results will be two objects that are linked together:
