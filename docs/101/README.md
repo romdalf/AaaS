@@ -45,11 +45,11 @@ The output would like like:
 ```
 curl -sL https://storageos.run |bash
 ```
-```
-Welcome to the StorageOS quick installation script.
-I will install StorageOS version v2.4.0-rc.1 into
-namespace kube-system now. If I encounter any errors
-I will stop immediately.
+
+>Welcome to the StorageOS quick installation script.  
+>I will install StorageOS version v2.4.0-rc.1 into  
+>namespace kube-system now. If I encounter any errors  
+>I will stop immediately.  
 
 Creating etcd namespace storageos-etcd
 namespace/storageos-etcd created
