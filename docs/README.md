@@ -1,4 +1,4 @@
-# anything-as-a-Service (AaaS)
+# anything-as-a-service (AaaS)
 
 ## learner Outcomes
 * Get familiar with kubernetes and persistent storage
